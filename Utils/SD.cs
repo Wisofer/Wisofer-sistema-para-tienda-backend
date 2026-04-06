@@ -27,11 +27,13 @@ public static class SD
     // ========== TIPOS DE MOVIMIENTO DE INVENTARIO ==========
     public const string TipoMovimientoEntrada = "Entrada";
     public const string TipoMovimientoSalida = "Salida";
+    public const string TipoMovimientoAjuste = "Ajuste";
 
     // Subtipos de Movimiento
     public const string SubtipoMovimientoCompra = "Compra";
     public const string SubtipoMovimientoVenta = "Venta";
     public const string SubtipoMovimientoAjuste = "Ajuste";
+    public const string SubtipoMovimientoAjusteFisico = "Inventario físico";
     public const string SubtipoMovimientoDevolucion = "Devolución";
 
     // Tipo de Cambio (Referencial)

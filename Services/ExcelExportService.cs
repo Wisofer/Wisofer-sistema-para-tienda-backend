@@ -155,6 +155,35 @@ public class ExcelExportService
         return package.GetAsByteArray();
     }
 
+    public byte[] ExportarMovimientosInventario(IEnumerable<dynamic> movimientos)
+    {
+        using var package = new ExcelPackage();
+        string[] headers = { "Id", "Fecha", "Tipo", "Subtipo", "Producto", "Variante", "Cantidad", "Stock ant.", "Stock nuevo", "Costo total", "Usuario", "Ref.", "Observaciones" };
+        var worksheet = PrepareSheet(package, "Movimientos inventario", headers, HeaderGreen);
+
+        int row = 2;
+        foreach (var m in movimientos)
+        {
+            worksheet.Cells[row, 1].Value = m.id;
+            worksheet.Cells[row, 2].Value = m.fecha is DateTime dt ? dt.ToString("dd/MM/yyyy HH:mm") : "";
+            worksheet.Cells[row, 3].Value = m.tipo ?? "";
+            worksheet.Cells[row, 4].Value = m.subtipo ?? "";
+            worksheet.Cells[row, 5].Value = m.producto ?? "";
+            worksheet.Cells[row, 6].Value = m.variante ?? "";
+            worksheet.Cells[row, 7].Value = m.cantidad ?? 0;
+            worksheet.Cells[row, 8].Value = m.stockAnterior ?? 0;
+            worksheet.Cells[row, 9].Value = m.stockNuevo ?? 0;
+            SetCellMoney(worksheet, row, 10, m.costoTotal);
+            worksheet.Cells[row, 11].Value = m.usuario ?? "";
+            worksheet.Cells[row, 12].Value = m.referencia ?? "";
+            worksheet.Cells[row, 13].Value = m.observaciones ?? "";
+            row++;
+        }
+
+        ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Movimientos de inventario");
+        return package.GetAsByteArray();
+    }
+
     private void SetCellMoney(ExcelWorksheet sheet, int row, int col, object? val)
     {
         sheet.Cells[row, col].Value = Convert.ToDecimal(val ?? 0m);

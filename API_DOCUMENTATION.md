@@ -96,6 +96,20 @@ Los endpoints usan `[Authorize(Policy = "Admin")]` para operaciones administrati
 
 Lecturas: cualquier usuario autenticado. Escrituras: `Admin`.
 
+### 3.3 Movimientos de inventario (manual)
+
+**Base:** `/api/v1/inventario` — **política `Admin`**.
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/movimientos` | Listado paginado. Query: `desde`, `hasta` (fecha), `productoId`, `tipo` (`Entrada`, `Salida`, `Ajuste`), `page`, `pageSize` (máx. 200). |
+| `GET` | `/movimientos/exportar` | Excel (mismos filtros que listado, hasta 100 000 filas). |
+| `POST` | `/entrada` | JSON: `productoId`, `productoVarianteId` (opc.; obligatorio si hay varias variantes), `cantidad`, `costoUnitario`, `proveedorId`, `numeroReferencia`, `observaciones`. |
+| `POST` | `/salida` | JSON: `productoId`, `productoVarianteId`, `cantidad`, `subtipo` (ej. motivo), `observaciones`. |
+| `POST` | `/ajuste` | JSON: `productoId`, `productoVarianteId`, `stockFisicoReal` (conteo físico nuevo), `observaciones`. |
+
+Solo aplica a productos con **`controlarStock: true`**. Si el producto tiene **más de una variante**, hay que enviar **`productoVarianteId`**.
+
 ---
 
 ## 4. Dashboard

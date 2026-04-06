@@ -1,4 +1,5 @@
 using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Api;
 using SistemaDeTienda.Models.Entities;
 using SistemaDeTienda.Services.IServices;
 using SistemaDeTienda.Utils;
@@ -56,6 +57,47 @@ public class InventarioService : IInventarioService
             .FirstOrDefault(m => m.Id == id);
     }
 
+    public PagedResult<MovimientoInventario> ObtenerMovimientosPaginado(DateTime? desde, DateTime? hasta, int? productoId, string? tipo, int page, int pageSize)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 50;
+        if (pageSize > 200) pageSize = 200;
+
+        var query = _context.MovimientosInventario
+            .Include(m => m.Producto)
+            .Include(m => m.ProductoVariante)
+            .Include(m => m.Usuario)
+            .AsQueryable();
+
+        if (desde.HasValue)
+            query = query.Where(m => m.Fecha >= desde.Value.Date);
+        if (hasta.HasValue)
+            query = query.Where(m => m.Fecha <= hasta.Value.Date.AddDays(1).AddTicks(-1));
+        if (productoId.HasValue)
+            query = query.Where(m => m.ProductoId == productoId.Value);
+        if (!string.IsNullOrWhiteSpace(tipo))
+        {
+            var t = tipo.Trim();
+            query = query.Where(m => m.Tipo == t);
+        }
+
+        var total = query.Count();
+        var items = query
+            .OrderByDescending(m => m.Fecha)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PagedResult<MovimientoInventario>
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = total,
+            TotalPages = (int)Math.Ceiling((double)total / pageSize)
+        };
+    }
+
     public MovimientoInventario RegistrarEntrada(int productoId, int? varianteId, int cantidad, decimal costoUnitario, int? proveedorId, string? numeroReferencia, string? observaciones, int usuarioId)
     {
         var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
@@ -100,8 +142,8 @@ public class InventarioService : IInventarioService
         {
             ProductoId = productoId,
             ProductoVarianteId = varianteId,
-            Tipo = "Entrada",
-            Subtipo = "Compra",
+            Tipo = SD.TipoMovimientoEntrada,
+            Subtipo = SD.SubtipoMovimientoCompra,
             Cantidad = cantidad,
             CostoUnitario = costoUnitario,
             CostoTotal = costoUnitario * cantidad,
@@ -110,7 +152,70 @@ public class InventarioService : IInventarioService
             NumeroReferencia = numeroReferencia,
             Observaciones = observaciones,
             StockAnterior = stockAnterior,
-            StockNuevo = stockNuevo
+            StockNuevo = stockNuevo,
+            ProveedorId = proveedorId
+        };
+
+        _context.MovimientosInventario.Add(movimiento);
+        _context.SaveChanges();
+
+        return movimiento;
+    }
+
+    public MovimientoInventario RegistrarAjuste(int productoId, int? varianteId, int stockFisicoReal, string? observaciones, int usuarioId)
+    {
+        if (stockFisicoReal < 0)
+            throw new Exception("El stock físico no puede ser negativo.");
+
+        var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
+        if (producto == null) throw new Exception("Producto no encontrado");
+        if (!producto.ControlarStock) throw new Exception("Este producto no controla inventario.");
+
+        int stockAnterior;
+
+        if (varianteId.HasValue)
+        {
+            var variante = producto.Variantes.FirstOrDefault(v => v.Id == varianteId.Value);
+            if (variante == null) throw new Exception("Variante no encontrada");
+            stockAnterior = variante.Stock;
+            variante.Stock = stockFisicoReal;
+        }
+        else if (producto.Variantes.Count == 1)
+        {
+            var variante = producto.Variantes.First();
+            stockAnterior = variante.Stock;
+            variante.Stock = stockFisicoReal;
+        }
+        else if (producto.Variantes.Count == 0)
+        {
+            stockAnterior = producto.StockTotal;
+            producto.StockTotal = stockFisicoReal;
+        }
+        else
+        {
+            throw new Exception("Debe indicar la variante (talla/color) para este producto.");
+        }
+
+        producto.StockTotal = producto.Variantes.Any()
+            ? producto.Variantes.Sum(v => v.Stock)
+            : producto.StockTotal;
+
+        var delta = stockFisicoReal - stockAnterior;
+
+        var movimiento = new MovimientoInventario
+        {
+            ProductoId = productoId,
+            ProductoVarianteId = varianteId,
+            Tipo = SD.TipoMovimientoAjuste,
+            Subtipo = SD.SubtipoMovimientoAjusteFisico,
+            Cantidad = delta,
+            CostoUnitario = 0,
+            CostoTotal = 0,
+            Fecha = DateTime.Now,
+            UsuarioId = usuarioId,
+            Observaciones = observaciones,
+            StockAnterior = stockAnterior,
+            StockNuevo = stockFisicoReal
         };
 
         _context.MovimientosInventario.Add(movimiento);
@@ -168,7 +273,7 @@ public class InventarioService : IInventarioService
         {
             ProductoId = productoId,
             ProductoVarianteId = varianteId,
-            Tipo = "Salida",
+            Tipo = SD.TipoMovimientoSalida,
             Subtipo = subtipo,
             Cantidad = -cantidad,
             Fecha = DateTime.Now,
