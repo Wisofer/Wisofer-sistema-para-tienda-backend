@@ -60,6 +60,7 @@ public class InventarioService : IInventarioService
     {
         var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
         if (producto == null) throw new Exception("Producto no encontrado");
+        if (!producto.ControlarStock) throw new Exception("Este producto no controla inventario.");
 
         int stockAnterior;
         int stockNuevo;
@@ -73,15 +74,27 @@ public class InventarioService : IInventarioService
             stockNuevo = stockAnterior + cantidad;
             variante.Stock = stockNuevo;
         }
-        else
+        else if (producto.Variantes.Count == 1)
+        {
+            var variante = producto.Variantes.First();
+            stockAnterior = variante.Stock;
+            stockNuevo = stockAnterior + cantidad;
+            variante.Stock = stockNuevo;
+        }
+        else if (producto.Variantes.Count == 0)
         {
             stockAnterior = producto.StockTotal;
             stockNuevo = stockAnterior + cantidad;
+            producto.StockTotal = stockNuevo;
+        }
+        else
+        {
+            throw new Exception("Debe indicar la variante (talla/color) para este producto.");
         }
 
-        // Actualizar stock total del producto
-        producto.StockTotal = producto.Variantes.Sum(v => v.Stock);
-        if (!varianteId.HasValue) producto.StockTotal = stockNuevo; 
+        producto.StockTotal = producto.Variantes.Any()
+            ? producto.Variantes.Sum(v => v.Stock)
+            : producto.StockTotal;
 
         var movimiento = new MovimientoInventario
         {
@@ -110,6 +123,7 @@ public class InventarioService : IInventarioService
     {
         var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
         if (producto == null) throw new Exception("Producto no encontrado");
+        if (!producto.ControlarStock) throw new Exception("Este producto no controla inventario.");
 
         int stockAnterior;
         int stockNuevo;
@@ -125,14 +139,30 @@ public class InventarioService : IInventarioService
             stockNuevo = stockAnterior - cantidad;
             variante.Stock = stockNuevo;
         }
-        else
+        else if (producto.Variantes.Count == 1)
+        {
+            var variante = producto.Variantes.First();
+            if (variante.Stock < cantidad) throw new Exception("Stock insuficiente en variante");
+
+            stockAnterior = variante.Stock;
+            stockNuevo = stockAnterior - cantidad;
+            variante.Stock = stockNuevo;
+        }
+        else if (producto.Variantes.Count == 0)
         {
             if (producto.StockTotal < cantidad) throw new Exception("Stock insuficiente en producto");
             stockAnterior = producto.StockTotal;
             stockNuevo = stockAnterior - cantidad;
+            producto.StockTotal = stockNuevo;
+        }
+        else
+        {
+            throw new Exception("Debe indicar la variante (talla/color) para este producto.");
         }
 
-        producto.StockTotal = producto.Variantes.Any() ? producto.Variantes.Sum(v => v.Stock) : stockNuevo;
+        producto.StockTotal = producto.Variantes.Any()
+            ? producto.Variantes.Sum(v => v.Stock)
+            : producto.StockTotal;
 
         var movimiento = new MovimientoInventario
         {
@@ -157,20 +187,29 @@ public class InventarioService : IInventarioService
 
     public bool ValidarStockDisponible(int productoId, int? varianteId, int cantidad)
     {
+        var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
+        if (producto == null) return false;
+        if (!producto.ControlarStock) return true;
+
         if (varianteId.HasValue)
         {
-            var variante = _context.ProductoVariantes.FirstOrDefault(v => v.Id == varianteId.Value);
+            var variante = producto.Variantes.FirstOrDefault(v => v.Id == varianteId.Value);
             return variante != null && variante.Stock >= cantidad;
         }
-        
-        var producto = _context.Productos.FirstOrDefault(p => p.Id == productoId);
-        return producto != null && producto.StockTotal >= cantidad;
+
+        if (producto.Variantes.Count == 1)
+            return producto.Variantes.First().Stock >= cantidad;
+
+        if (producto.Variantes.Count == 0)
+            return producto.StockTotal >= cantidad;
+
+        return false;
     }
 
     public List<Producto> ObtenerProductosStockBajo()
     {
         return _context.Productos
-            .Where(p => p.Activo && p.StockTotal <= p.StockMinimo)
+            .Where(p => p.Activo && p.ControlarStock && p.StockMinimo > 0 && p.StockTotal <= p.StockMinimo)
             .OrderBy(p => p.StockTotal)
             .ToList();
     }

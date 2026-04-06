@@ -14,16 +14,13 @@ namespace SistemaDeTienda.Controllers.Api.V1;
 public class ProductosApiController : BaseApiController
 {
     private readonly ApplicationDbContext _context;
-    private readonly IInventarioService _inventarioService;
     private readonly IStorageService _storageService;
 
     public ProductosApiController(
-        ApplicationDbContext context, 
-        IInventarioService inventarioService, 
+        ApplicationDbContext context,
         IStorageService storageService)
     {
         _context = context;
-        _inventarioService = inventarioService;
         _storageService = storageService;
     }
 
@@ -145,7 +142,6 @@ public class ProductosApiController : BaseApiController
             PrecioCompra = request.PrecioCompra,
             CategoriaProductoId = request.CategoriaProductoId,
             ProveedorId = request.ProveedorId,
-            StockMinimo = request.StockMinimo,
             ControlarStock = request.ControlarStock,
             Activo = request.Activo,
             FechaCreacion = DateTime.Now
@@ -165,17 +161,40 @@ public class ProductosApiController : BaseApiController
             }
         }
 
-        // Si se proporciona una talla en el formulario simplified, crear la primera variante
-        if (!string.IsNullOrWhiteSpace(request.Talla))
+        if (producto.ControlarStock)
         {
-            producto.Variantes.Add(new ProductoVariante
+            producto.StockMinimo = request.StockMinimo;
+            if (!string.IsNullOrWhiteSpace(request.Talla))
             {
-                Talla = request.Talla.Trim(),
-                Color = "N/A", // Valor por defecto
-                Stock = request.StockActual ?? 0,
-                SKU = producto.Codigo
-            });
-            producto.StockTotal = request.StockActual ?? 0;
+                var stockVar = request.StockActual ?? 0;
+                producto.Variantes.Add(new ProductoVariante
+                {
+                    Talla = request.Talla.Trim(),
+                    Color = "N/A",
+                    Stock = stockVar,
+                    SKU = producto.Codigo
+                });
+                producto.StockTotal = stockVar;
+            }
+            else
+            {
+                producto.StockTotal = request.StockActual ?? 0;
+            }
+        }
+        else
+        {
+            producto.StockMinimo = 0;
+            producto.StockTotal = 0;
+            if (!string.IsNullOrWhiteSpace(request.Talla))
+            {
+                producto.Variantes.Add(new ProductoVariante
+                {
+                    Talla = request.Talla.Trim(),
+                    Color = "N/A",
+                    Stock = 0,
+                    SKU = producto.Codigo
+                });
+            }
         }
 
         _context.Productos.Add(producto);
@@ -200,10 +219,19 @@ public class ProductosApiController : BaseApiController
         producto.PrecioCompra = request.PrecioCompra;
         producto.CategoriaProductoId = request.CategoriaProductoId;
         producto.ProveedorId = request.ProveedorId;
-        producto.StockMinimo = request.StockMinimo;
         producto.ControlarStock = request.ControlarStock;
         producto.Activo = request.Activo;
         producto.FechaActualizacion = DateTime.Now;
+
+        if (producto.ControlarStock)
+            producto.StockMinimo = request.StockMinimo;
+        else
+        {
+            producto.StockMinimo = 0;
+            producto.StockTotal = 0;
+            foreach (var v in producto.Variantes)
+                v.Stock = 0;
+        }
 
         if (!string.IsNullOrWhiteSpace(request.Codigo)) producto.Codigo = request.Codigo.Trim();
 
@@ -270,6 +298,7 @@ public class ProductoUpsertRequest
     public int? CategoriaProductoId { get; set; }
     public int? ProveedorId { get; set; }
     public int StockMinimo { get; set; }
+    /// <summary>En formularios HTML, usar input hidden value=false + checkbox para enviar false cuando no se marca.</summary>
     public bool ControlarStock { get; set; } = true;
     public bool Activo { get; set; } = true;
 

@@ -187,6 +187,9 @@ public class VentaService : IVentaService
 
         if (producto.ControlarStock)
         {
+            if (item.ProductoVarianteId == null && producto.Variantes.Count > 1)
+                throw new Exception($"Debe elegir la variante (talla) para {producto.Nombre}.");
+
             if (!_inventarioService.ValidarStockDisponible(producto.Id, item.ProductoVarianteId, item.Cantidad))
                 throw new Exception($"Stock insuficiente para {producto.Nombre} {(variante != null ? $"({variante.Talla})" : "")}.");
 
