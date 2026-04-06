@@ -59,6 +59,23 @@ public class ReportesApiController : BaseApiController
         }
     }
 
+    /// <summary>Una venta (ticket) con todas las líneas de producto. Solo ventas cobradas.</summary>
+    [HttpGet("ventas/{id:int}/ticket-detalle")]
+    public async Task<IActionResult> TicketDetalle(int id)
+    {
+        try
+        {
+            var ticket = await _reporteService.ObtenerTicketCompletoPorVentaIdAsync(id);
+            if (ticket == null)
+                return FailResponse("Venta no encontrada o aún no cobrada.", StatusCodes.Status404NotFound);
+            return OkResponse(ticket);
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
     [HttpGet("ventas-por-categoria")]
     public async Task<IActionResult> VentasPorCategoria([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] bool exportar = false)
     {

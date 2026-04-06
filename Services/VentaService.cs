@@ -29,9 +29,13 @@ public class VentaService : IVentaService
         ValidarRequestVenta(request);
         ValidarCajaAbierta();
 
-        using var tx = await _context.Database.BeginTransactionAsync();
+        await using var tx = await _context.Database.BeginTransactionAsync();
         try
         {
+            // Evita números de ticket duplicados si hay ventas concurrentes (PostgreSQL).
+            if (_context.Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
+                await _context.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(5849271001);");
+
             var venta = new Venta
             {
                 Numero = GenerarNumeroTicket(),
@@ -150,6 +154,15 @@ public class VentaService : IVentaService
     {
         if (request.Items == null || request.Items.Count == 0)
             throw new Exception("Debe agregar al menos un producto.");
+
+        for (var i = 0; i < request.Items.Count; i++)
+        {
+            var it = request.Items[i];
+            if (it.ProductoId <= 0)
+                throw new Exception($"Línea {i + 1}: producto no válido.");
+            if (it.Cantidad <= 0)
+                throw new Exception($"Línea {i + 1}: la cantidad debe ser mayor a cero.");
+        }
     }
 
     private void ValidarRequestPago(ProcesarPagoVentaRequest request)
@@ -171,6 +184,9 @@ public class VentaService : IVentaService
 
     private async Task<decimal> ProcesarItemVentaAsync(Venta venta, PosVentaItemRequest item, int usuarioId)
     {
+        if (item.Cantidad <= 0)
+            throw new Exception("La cantidad debe ser mayor a cero.");
+
         var producto = await _context.Productos.Include(p => p.Variantes).FirstOrDefaultAsync(p => p.Id == item.ProductoId);
         if (producto == null) throw new Exception($"Producto {item.ProductoId} no encontrado.");
 

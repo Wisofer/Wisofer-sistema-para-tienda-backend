@@ -175,7 +175,8 @@ La lógica de negocio exige **caja abierta** para registrar ventas y cobros (ver
 | Método | Ruta | Notas |
 |--------|------|--------|
 | `GET` | `/api/v1/reportes/resumen-ventas` | `exportar=true` → Excel. |
-| `GET` | `/api/v1/reportes/resumen-ventas/detalle` | Detalle JSON. |
+| `GET` | `/api/v1/reportes/resumen-ventas/detalle` | Lista de **tickets** (una fila por venta): total cobrado (neto), subtotal líneas, cantidad de líneas. |
+| `GET` | `/api/v1/reportes/ventas/{id}/ticket-detalle` | **Un solo ticket** con todas las líneas (`producto`, `cantidad`, `precio`, subtotales). Solo ventas cobradas. |
 | `GET` | `/api/v1/reportes/ventas-por-categoria` | `exportar=true` → Excel. |
 | `GET` | `/api/v1/reportes/productos-top` | Parámetro `top`; `exportar=true` → Excel. |
 

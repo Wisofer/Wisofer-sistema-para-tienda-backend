@@ -55,11 +55,14 @@ public class ReporteService : IReporteService
     {
         var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today);
         var ventas = await QueryVentasPagadas(fDesde, fHasta)
+            .Include(v => v.DetalleVentas)
             .Include(v => v.Cliente)
             .Include(v => v.Usuario)
             .OrderBy(v => v.Fecha)
             .ThenBy(v => v.Id)
             .ToListAsync();
+
+        var netoPorVenta = await GetNetoPorVentaAsync(ventas);
 
         return ventas.Select(v => new VentaDetalleReporte
         {
@@ -68,9 +71,56 @@ public class ReporteService : IReporteService
             Fecha = v.Fecha,
             Cliente = v.Cliente?.Nombre ?? "Cliente General",
             Usuario = v.Usuario?.NombreUsuario,
-            Total = v.Total,
+            SubtotalLineas = v.Total,
+            Total = netoPorVenta.GetValueOrDefault(v.Id, v.Total),
+            CantidadLineas = v.DetalleVentas.Count,
             Estado = v.Estado
         }).ToList();
+    }
+
+    public async Task<VentaTicketCompletoReporte?> ObtenerTicketCompletoPorVentaIdAsync(int ventaId)
+    {
+        var v = await _context.Ventas.AsNoTracking()
+            .Include(x => x.DetalleVentas).ThenInclude(d => d.Producto)
+            .Include(x => x.DetalleVentas).ThenInclude(d => d.ProductoVariante)
+            .Include(x => x.Cliente)
+            .Include(x => x.Usuario)
+            .FirstOrDefaultAsync(x => x.Id == ventaId);
+
+        if (v == null) return null;
+        if (v.Estado != SD.EstadoVentaPagado && v.Estado != SD.EstadoVentaCompletada)
+            return null;
+
+        var netoMap = await GetNetoPorVentaAsync(new[] { v });
+        var lineas = v.DetalleVentas.OrderBy(d => d.Id).Select(d => new VentaLineaReporte
+        {
+            ProductoId = d.ProductoId,
+            CodigoProducto = d.Producto?.Codigo ?? "",
+            NombreProducto = d.Producto?.Nombre ?? "",
+            ProductoVarianteId = d.ProductoVarianteId,
+            Talla = d.ProductoVariante?.Talla,
+            Cantidad = d.Cantidad,
+            PrecioUnitario = d.PrecioUnitario,
+            Subtotal = d.Subtotal,
+            TotalLinea = d.Total
+        }).ToList();
+
+        var unidades = lineas.Sum(l => l.Cantidad);
+
+        return new VentaTicketCompletoReporte
+        {
+            Id = v.Id,
+            Numero = v.Numero,
+            Fecha = v.Fecha,
+            Cliente = v.Cliente?.Nombre ?? "Cliente General",
+            Cajero = v.Usuario?.NombreCompleto ?? v.Usuario?.NombreUsuario,
+            Estado = v.Estado,
+            SubtotalLineas = v.Total,
+            TotalCobrado = netoMap.GetValueOrDefault(v.Id, v.Total),
+            CantidadLineas = lineas.Count,
+            CantidadUnidades = unidades,
+            Lineas = lineas
+        };
     }
 
     public async Task<List<VentaPorCategoriaReporte>> ObtenerVentasPorCategoriaAsync(DateTime? desde, DateTime? hasta)
@@ -125,7 +175,9 @@ public class ReporteService : IReporteService
         {
             numero = v.Numero,
             fecha = v.Fecha,
-            metodoPago = "Venta POS", // Simplificado
+            metodoPago = "Venta POS",
+            lineas = v.CantidadLineas,
+            subtotalLineas = v.SubtotalLineas,
             total = v.Total
         }).ToList();
 

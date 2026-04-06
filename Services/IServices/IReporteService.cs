@@ -8,9 +8,14 @@ public interface IReporteService
     Task<ResumenVentasResponse> ObtenerResumenVentasAsync(DateTime? desde, DateTime? hasta);
 
     /// <summary>
-    /// Obtiene el detalle de ventas en un rango de fechas.
+    /// Obtiene el detalle de ventas en un rango de fechas (una fila por ticket).
     /// </summary>
     Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta);
+
+    /// <summary>
+    /// Un ticket con todas sus líneas de producto (venta pagada).
+    /// </summary>
+    Task<VentaTicketCompletoReporte?> ObtenerTicketCompletoPorVentaIdAsync(int ventaId);
 
     /// <summary>
     /// Obtiene las ventas agrupadas por categoría de producto.
@@ -62,8 +67,42 @@ public class VentaDetalleReporte
     public DateTime Fecha { get; set; }
     public string Cliente { get; set; } = "Cliente General";
     public string? Usuario { get; set; }
+    /// <summary>Total cobrado (neto tras descuento en pago, si aplica).</summary>
     public decimal Total { get; set; }
+    /// <summary>Suma de líneas antes de descuento global en cobro.</summary>
+    public decimal SubtotalLineas { get; set; }
+    /// <summary>Cantidad de líneas de detalle en el ticket.</summary>
+    public int CantidadLineas { get; set; }
     public string Estado { get; set; } = string.Empty;
+}
+
+/// <summary>Detalle completo de un ticket para reportes (una venta, N líneas).</summary>
+public class VentaTicketCompletoReporte
+{
+    public int Id { get; set; }
+    public string Numero { get; set; } = string.Empty;
+    public DateTime Fecha { get; set; }
+    public string Cliente { get; set; } = "";
+    public string? Cajero { get; set; }
+    public string Estado { get; set; } = "";
+    public decimal SubtotalLineas { get; set; }
+    public decimal TotalCobrado { get; set; }
+    public int CantidadLineas { get; set; }
+    public int CantidadUnidades { get; set; }
+    public List<VentaLineaReporte> Lineas { get; set; } = new();
+}
+
+public class VentaLineaReporte
+{
+    public int ProductoId { get; set; }
+    public string CodigoProducto { get; set; } = "";
+    public string NombreProducto { get; set; } = "";
+    public int? ProductoVarianteId { get; set; }
+    public string? Talla { get; set; }
+    public int Cantidad { get; set; }
+    public decimal PrecioUnitario { get; set; }
+    public decimal Subtotal { get; set; }
+    public decimal TotalLinea { get; set; }
 }
 
 public class VentaPorCategoriaReporte
