@@ -50,11 +50,9 @@ public class VentasApiController : BaseApiController
         }
     }
 
+    /// <summary>Alias de <see cref="ProcesarPago"/> para clientes que usan esta ruta legada.</summary>
     [HttpPost("gestionar-pago")]
-    public async Task<IActionResult> GestionarPago([FromBody] ProcesarPagoVentaRequest request)
-    {
-        return await ProcesarPago(request);
-    }
+    public Task<IActionResult> GestionarPago([FromBody] ProcesarPagoVentaRequest request) => ProcesarPago(request);
 
     [HttpGet("{id:int}/ticket")]
     public async Task<IActionResult> DescargarTicket(int id)
@@ -69,8 +67,4 @@ public class VentasApiController : BaseApiController
             return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
         }
     }
-}
-
-public class GestionarPagoVentaRequest : ProcesarPagoVentaRequest
-{
 }

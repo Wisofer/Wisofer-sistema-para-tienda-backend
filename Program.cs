@@ -1,6 +1,5 @@
 using SistemaDeTienda.Data;
 using SistemaDeTienda.Models.Api;
-using SistemaDeTienda.Models.Entities;
 using SistemaDeTienda.Services;
 using SistemaDeTienda.Services.IServices;
 using SistemaDeTienda.Utils;
@@ -129,11 +128,12 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
+        dbContext.Database.Migrate();
         InicializarUsuarioAdmin.CrearAdminSiNoExiste(dbContext, logger);
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "Error al inicializar la base de datos");
+        logger.LogError(ex, "Error al migrar o inicializar la base de datos");
     }
 }
 
