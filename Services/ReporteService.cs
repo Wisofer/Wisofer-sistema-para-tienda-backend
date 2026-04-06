@@ -1,0 +1,170 @@
+using BarRestPOS.Data;
+using BarRestPOS.Models.Entities;
+using BarRestPOS.Services.IServices;
+using BarRestPOS.Utils;
+using Microsoft.EntityFrameworkCore;
+
+namespace BarRestPOS.Services;
+
+public class ReporteService : IReporteService
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ExcelExportService _excelExportService;
+
+    public ReporteService(ApplicationDbContext context, ExcelExportService excelExportService)
+    {
+        _context = context;
+        _excelExportService = excelExportService;
+    }
+
+    public async Task<ResumenVentasResponse> ObtenerResumenVentasAsync(DateTime? desde, DateTime? hasta)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today);
+        var ventas = await QueryVentasPagadas(fDesde, fHasta).ToListAsync();
+        var netoPorVenta = await GetNetoPorVentaAsync(ventas);
+
+        decimal CalcularNeto(IEnumerable<Venta> vs) =>
+            Math.Round(vs.Sum(v => netoPorVenta.GetValueOrDefault(v.Id)), 2, MidpointRounding.AwayFromZero);
+
+        var totalVentas = CalcularNeto(ventas);
+        var totalTickets = ventas.Count;
+
+        var porDia = ventas
+            .GroupBy(v => v.Fecha.Date)
+            .Select(g => new VentaPorDiaReporte
+            {
+                Fecha = g.Key,
+                Total = CalcularNeto(g),
+                Tickets = g.Count()
+            })
+            .OrderBy(x => x.Fecha)
+            .ToList();
+
+        return new ResumenVentasResponse
+        {
+            Desde = fDesde,
+            Hasta = fHasta,
+            TotalVentas = totalVentas,
+            TotalTickets = totalTickets,
+            PromedioTicket = totalTickets > 0 ? (totalVentas / totalTickets) : 0,
+            PorDia = porDia
+        };
+    }
+
+    public async Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today);
+        var ventas = await QueryVentasPagadas(fDesde, fHasta)
+            .Include(v => v.Cliente)
+            .Include(v => v.Usuario)
+            .OrderBy(v => v.Fecha)
+            .ThenBy(v => v.Id)
+            .ToListAsync();
+
+        return ventas.Select(v => new VentaDetalleReporte
+        {
+            Id = v.Id,
+            Numero = v.Numero,
+            Fecha = v.Fecha,
+            Cliente = v.Cliente?.Nombre ?? "Cliente General",
+            Usuario = v.Usuario?.NombreUsuario,
+            Total = v.Total,
+            Estado = v.Estado
+        }).ToList();
+    }
+
+    public async Task<List<VentaPorCategoriaReporte>> ObtenerVentasPorCategoriaAsync(DateTime? desde, DateTime? hasta)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
+        
+        var ventasPorCategoriaRaw = await _context.DetalleVentas.AsNoTracking()
+            .Include(dv => dv.Venta)
+            .Include(dv => dv.Producto).ThenInclude(p => p.CategoriaProducto)
+            .Where(dv => (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) && 
+                         dv.Venta.Fecha >= fDesde && dv.Venta.Fecha <= fHasta)
+            .Select(g => new {
+                Categoria = g.Producto.CategoriaProducto != null ? g.Producto.CategoriaProducto.Nombre : "Sin categoría",
+                Monto = g.Total,
+                Cantidad = g.Cantidad
+            }).ToListAsync();
+
+        return ventasPorCategoriaRaw
+            .GroupBy(v => v.Categoria)
+            .Select(g => new VentaPorCategoriaReporte {
+                Categoria = g.Key,
+                Monto = Math.Round(g.Sum(x => x.Monto), 2),
+                Cantidad = g.Sum(x => x.Cantidad)
+            })
+            .OrderByDescending(v => v.Monto).ToList();
+    }
+
+    public async Task<List<ProductoTopReporte>> ObtenerProductosTopAsync(DateTime? desde, DateTime? hasta, int top)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
+        var limit = Math.Min(Math.Max(top, 1), 100);
+
+        return await _context.DetalleVentas.AsNoTracking()
+            .Include(i => i.Venta).Include(i => i.Producto)
+            .Where(i => (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
+                        i.Venta.Fecha >= fDesde && i.Venta.Fecha <= fHasta)
+            .GroupBy(i => new { i.ProductoId, i.Producto.Nombre })
+            .Select(g => new ProductoTopReporte { 
+                ProductoId = g.Key.ProductoId, 
+                Producto = g.Key.Nombre, 
+                Cantidad = g.Sum(x => x.Cantidad), 
+                Venta = g.Sum(x => x.Total) 
+            })
+            .OrderByDescending(x => x.Cantidad)
+            .Take(limit)
+            .ToListAsync();
+    }
+
+    public byte[] GenerarExcelVentas(DateTime desde, DateTime hasta, List<VentaDetalleReporte> ventas)
+    {
+        var ventasExcel = ventas.Select(v => new
+        {
+            numero = v.Numero,
+            fecha = v.Fecha,
+            metodoPago = "Venta POS", // Simplificado
+            total = v.Total
+        }).ToList();
+
+        return _excelExportService.ExportarVentasReporte(ventasExcel);
+    }
+
+    public byte[] GenerarExcelCategorias(DateTime desde, DateTime hasta, List<VentaPorCategoriaReporte> items)
+    {
+        return _excelExportService.ExportarVentasPorCategoria(items.Select(x => new { Categoria = x.Categoria, Cantidad = x.Cantidad, Monto = x.Monto }).ToList());
+    }
+
+    public byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items)
+    {
+        return _excelExportService.ExportarTopProductos(items.Select(x => new { Producto = x.Producto, Cantidad = x.Cantidad, Venta = x.Venta }).ToList());
+    }
+
+    #region Helpers Privados
+
+    private static (DateTime desde, DateTime hasta) ResolverRango(DateTime? desde, DateTime? hasta, DateTime fallbackDesde)
+    {
+        var fDesde = desde?.Date ?? fallbackDesde.Date;
+        var fHasta = (hasta?.Date ?? DateTime.Today).AddDays(1).AddTicks(-1);
+        return (fDesde, fHasta);
+    }
+
+    private IQueryable<Venta> QueryVentasPagadas(DateTime fDesde, DateTime fHasta) =>
+        _context.Ventas.AsNoTracking().Where(f => (f.Estado == SD.EstadoVentaPagado || f.Estado == SD.EstadoVentaCompletada) && f.Fecha >= fDesde && f.Fecha <= fHasta);
+
+    private async Task<Dictionary<int, decimal>> GetNetoPorVentaAsync(IEnumerable<Venta> ventas)
+    {
+        var ventaIds = ventas.Select(v => v.Id).ToHashSet();
+        var pagosBatch = await _context.Pagos
+            .AsNoTracking()
+            .Include(p => p.PagoVentas)
+            .Where(p => (p.VentaId.HasValue && ventaIds.Contains(p.VentaId.Value))
+                || p.PagoVentas.Any(pv => ventaIds.Contains(pv.VentaId)))
+            .ToListAsync();
+        return CobroVentasHelper.NetoCobradoPorVenta(ventaIds, pagosBatch);
+    }
+
+    #endregion
+}

@@ -1,0 +1,1691 @@
+{
+  "Version": 1,
+  "Hash": "2x7HMi+sV/S98mrxqwSJHezPZxrjlPKtaowA0JtmP1k=",
+  "Source": "BarRestPOS",
+  "BasePath": "_content/BarRestPOS",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "BarRestPOS/wwwroot",
+      "Source": "BarRestPOS",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/15cqes73cr-bsa1q505io.gz",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/modal#[.{fingerprint=bsa1q505io}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/modal.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "srdodqbkw0",
+      "Integrity": "uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/modal.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/d9iecs11sn-rxczmwzgq4.gz",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/mesas/index#[.{fingerprint=rxczmwzgq4}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/mesas/index.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "73089mss9e",
+      "Integrity": "czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/mesas/index.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/guyjm5i1ai-zefz65wvgg.gz",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "css/tailwind#[.{fingerprint=zefz65wvgg}]?.css.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/css/tailwind.css",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "3jrl45l1mr",
+      "Integrity": "n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/css/tailwind.css"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/x283jnhbz5-i0e3cv467i.gz",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/caja/index#[.{fingerprint=i0e3cv467i}]?.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "di5q8rfzpd",
+      "Integrity": "m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/css/tailwind.css",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "css/tailwind#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "zefz65wvgg",
+      "Integrity": "y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/tailwind.css"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "images/logo#[.{fingerprint}]?.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "11hty88srr",
+      "Integrity": "df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/images/logo.jpeg"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/caja/index#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "i0e3cv467i",
+      "Integrity": "spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/caja/index.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/mesas/index.js",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/mesas/index#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "rxczmwzgq4",
+      "Integrity": "P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/mesas/index.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/modal.js",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "js/modal#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "bsa1q505io",
+      "Integrity": "JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/modal.js"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/error.mp3",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "sounds/error#[.{fingerprint}]?.mp3",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "h6ilyldrfd",
+      "Integrity": "SbUNXHnSoOVUPQD1pX1S7u0c4xE9jsqkHD/AjrTtqq4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/sounds/error.mp3"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/success.mp3",
+      "SourceId": "BarRestPOS",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/BarRestPOS",
+      "RelativePath": "sounds/success#[.{fingerprint}]?.mp3",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "i4w9s5iqsw",
+      "Integrity": "4npXoCoN6hog5ErjSeSxWTE/OWIrLzZhtvfsdRiOOD0=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/sounds/success.mp3"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "css/tailwind.css",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/guyjm5i1ai-zefz65wvgg.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.002597402597"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "384"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM="
+        }
+      ]
+    },
+    {
+      "Route": "css/tailwind.css",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/css/tailwind.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "621"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM="
+        }
+      ]
+    },
+    {
+      "Route": "css/tailwind.css.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/guyjm5i1ai-zefz65wvgg.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "384"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4="
+        }
+      ]
+    },
+    {
+      "Route": "css/tailwind.zefz65wvgg.css",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/guyjm5i1ai-zefz65wvgg.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.002597402597"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "384"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "zefz65wvgg"
+        },
+        {
+          "Name": "label",
+          "Value": "css/tailwind.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM="
+        }
+      ]
+    },
+    {
+      "Route": "css/tailwind.zefz65wvgg.css",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/css/tailwind.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "621"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "zefz65wvgg"
+        },
+        {
+          "Name": "label",
+          "Value": "css/tailwind.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-y/LjK4F2+Jo5yI6twdBTTyRvdcWcZZkjEavcMWDz3iM="
+        }
+      ]
+    },
+    {
+      "Route": "css/tailwind.zefz65wvgg.css.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/guyjm5i1ai-zefz65wvgg.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "384"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "zefz65wvgg"
+        },
+        {
+          "Name": "label",
+          "Value": "css/tailwind.css.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-n8aH0Ap5N2oBigU2gqC68e1l5SEU/zAJr8Skddcmfr4="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo.11hty88srr.jpeg",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "176266"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "11hty88srr"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo.jpeg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo.jpeg",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "176266"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.i0e3cv467i.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/x283jnhbz5-i0e3cv467i.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000156715248"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "6380"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "i0e3cv467i"
+        },
+        {
+          "Name": "label",
+          "Value": "js/caja/index.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.i0e3cv467i.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "32968"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "i0e3cv467i"
+        },
+        {
+          "Name": "label",
+          "Value": "js/caja/index.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.i0e3cv467i.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/x283jnhbz5-i0e3cv467i.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "6380"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "i0e3cv467i"
+        },
+        {
+          "Name": "label",
+          "Value": "js/caja/index.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/x283jnhbz5-i0e3cv467i.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000156715248"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "6380"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "32968"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-spHwuyLcXX19JS6R8xc5QbnhHuW2Jnixi7WGX/QX+5w="
+        }
+      ]
+    },
+    {
+      "Route": "js/caja/index.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/x283jnhbz5-i0e3cv467i.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "6380"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-m12/8Bv4IG2HB0e2Ion941KuoF5fSaaG/KsAWLXodj8="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/d9iecs11sn-rxczmwzgq4.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000459558824"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2175"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/mesas/index.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10472"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/d9iecs11sn-rxczmwzgq4.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2175"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.rxczmwzgq4.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/d9iecs11sn-rxczmwzgq4.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000459558824"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2175"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rxczmwzgq4"
+        },
+        {
+          "Name": "label",
+          "Value": "js/mesas/index.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.rxczmwzgq4.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/mesas/index.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10472"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rxczmwzgq4"
+        },
+        {
+          "Name": "label",
+          "Value": "js/mesas/index.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-P7J+N+y3izhrgRolXU9GKu7v7xrR5OAqwpMBDK4pgkI="
+        }
+      ]
+    },
+    {
+      "Route": "js/mesas/index.rxczmwzgq4.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/d9iecs11sn-rxczmwzgq4.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2175"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 03:29:44 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rxczmwzgq4"
+        },
+        {
+          "Name": "label",
+          "Value": "js/mesas/index.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-czMMZ2ShSsUNadR/XLcwKs5gTS5sT5srMEm8c5VMd7I="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.bsa1q505io.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/15cqes73cr-bsa1q505io.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000464037123"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2154"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bsa1q505io"
+        },
+        {
+          "Name": "label",
+          "Value": "js/modal.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.bsa1q505io.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/modal.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8517"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bsa1q505io"
+        },
+        {
+          "Name": "label",
+          "Value": "js/modal.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.bsa1q505io.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/15cqes73cr-bsa1q505io.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2154"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bsa1q505io"
+        },
+        {
+          "Name": "label",
+          "Value": "js/modal.js.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/15cqes73cr-bsa1q505io.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000464037123"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2154"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.js",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/modal.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "8517"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-JUVGU2m2ZPe3yYGCFBNnydCwAnRKnhHY4KGoTjHXg3w="
+        }
+      ]
+    },
+    {
+      "Route": "js/modal.js.gz",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/compressed/15cqes73cr-bsa1q505io.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2154"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-uOBVYtOSIw4qPUwswdxb4Baa67wl8Tk3M8EZwDTxd6c="
+        }
+      ]
+    },
+    {
+      "Route": "sounds/error.h6ilyldrfd.mp3",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/error.mp3",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "40748"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "audio/mpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"SbUNXHnSoOVUPQD1pX1S7u0c4xE9jsqkHD/AjrTtqq4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "h6ilyldrfd"
+        },
+        {
+          "Name": "label",
+          "Value": "sounds/error.mp3"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-SbUNXHnSoOVUPQD1pX1S7u0c4xE9jsqkHD/AjrTtqq4="
+        }
+      ]
+    },
+    {
+      "Route": "sounds/error.mp3",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/error.mp3",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "40748"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "audio/mpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"SbUNXHnSoOVUPQD1pX1S7u0c4xE9jsqkHD/AjrTtqq4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-SbUNXHnSoOVUPQD1pX1S7u0c4xE9jsqkHD/AjrTtqq4="
+        }
+      ]
+    },
+    {
+      "Route": "sounds/success.i4w9s5iqsw.mp3",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/success.mp3",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "137925"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "audio/mpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"4npXoCoN6hog5ErjSeSxWTE/OWIrLzZhtvfsdRiOOD0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "i4w9s5iqsw"
+        },
+        {
+          "Name": "label",
+          "Value": "sounds/success.mp3"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-4npXoCoN6hog5ErjSeSxWTE/OWIrLzZhtvfsdRiOOD0="
+        }
+      ]
+    },
+    {
+      "Route": "sounds/success.mp3",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/sounds/success.mp3",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "137925"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "audio/mpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"4npXoCoN6hog5ErjSeSxWTE/OWIrLzZhtvfsdRiOOD0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-4npXoCoN6hog5ErjSeSxWTE/OWIrLzZhtvfsdRiOOD0="
+        }
+      ]
+    }
+  ]
+}
