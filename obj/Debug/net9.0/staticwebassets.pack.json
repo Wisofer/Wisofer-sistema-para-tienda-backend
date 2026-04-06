@@ -5,8 +5,8 @@
       "PackagePath": "staticwebassets/css/tailwind.css"
     },
     {
-      "Id": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
-      "PackagePath": "staticwebassets/images/logo.jpeg"
+      "Id": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.png",
+      "PackagePath": "staticwebassets/images/logo.png"
     },
     {
       "Id": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",

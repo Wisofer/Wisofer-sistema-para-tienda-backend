@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "W5Olfimccz6eJnyTq03j3YbI6lwUCR0SFGejOSfUioU=",
+  "Hash": "YBycKJP/2J7IMFPdFS34gnWlR7GM82y9kzj9ACK7qR8=",
   "Source": "SistemaDeTienda",
   "BasePath": "_content/SistemaDeTienda",
   "Mode": "Default",
@@ -122,12 +122,12 @@
       "OriginalItemSpec": "wwwroot/css/tailwind.css"
     },
     {
-      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.png",
       "SourceId": "SistemaDeTienda",
       "SourceType": "Discovered",
       "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
       "BasePath": "_content/SistemaDeTienda",
-      "RelativePath": "images/logo#[.{fingerprint}]?.jpeg",
+      "RelativePath": "images/logo#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -136,11 +136,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "11hty88srr",
-      "Integrity": "df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=",
+      "Fingerprint": "y6w1c4yadd",
+      "Integrity": "OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/images/logo.jpeg"
+      "OriginalItemSpec": "wwwroot/images/logo.png"
     },
     {
       "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
@@ -548,8 +548,8 @@
       ]
     },
     {
-      "Route": "images/logo.11hty88srr.jpeg",
-      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
+      "Route": "images/logo.png",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -558,64 +558,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "176266"
+          "Value": "71639"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/jpeg"
+          "Value": "image/png"
         },
         {
           "Name": "ETag",
-          "Value": "\"df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=\""
+          "Value": "\"OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "11hty88srr"
-        },
-        {
-          "Name": "label",
-          "Value": "images/logo.jpeg"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k="
-        }
-      ]
-    },
-    {
-      "Route": "images/logo.jpeg",
-      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.jpeg",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "176266"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/jpeg"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Thu, 26 Mar 2026 01:50:05 GMT"
+          "Value": "Mon, 06 Apr 2026 00:09:24 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -625,7 +580,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-df3fmovnySEP4T4UZR1D9tqP9kD+db0zVolL2VEXp4k="
+          "Value": "sha256-OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo.y6w1c4yadd.png",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/logo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "71639"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 06 Apr 2026 00:09:24 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "y6w1c4yadd"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg="
         }
       ]
     },

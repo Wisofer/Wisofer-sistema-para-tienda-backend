@@ -2,30 +2,26 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SistemaDeTienda.Data;
-using SistemaDeTienda.Models.Entities;
 using SistemaDeTienda.Services.IServices;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace SistemaDeTienda.Services;
 
 public class TicketService : ITicketService
 {
     private readonly ApplicationDbContext _context;
-    private readonly IConfiguracionService _configService;
+    private readonly IWebHostEnvironment _env;
 
-    public TicketService(ApplicationDbContext context, IConfiguracionService configService)
+    public TicketService(ApplicationDbContext context, IWebHostEnvironment env)
     {
         _context = context;
-        _configService = configService;
-        
-        // Configuramos la licencia de fuente pública de QuestPDF
+        _env = env;
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
     public async Task<byte[]> GenerarTicketPdfAsync(int ventaId)
     {
-        // 1. Obtener la data
         var venta = await _context.Ventas
             .Include(v => v.Usuario)
             .Include(v => v.Cliente)
@@ -39,93 +35,117 @@ public class TicketService : ITicketService
             throw new Exception("Venta no encontrada para la generación del ticket.");
 
         var pago = await _context.Pagos.FirstOrDefaultAsync(p => p.VentaId == ventaId);
-        var nombreTienda = "SISTEMA DE TIENDA 🛍️"; // Opciones sacadas desde _configService si fuesen parametrizables
-        var nombreCajero = venta.Usuario?.NombreCompleto ?? "Admin";
+        var nombreCajero = venta.Usuario?.NombreCompleto ?? "—";
         var nombreCliente = venta.Cliente?.Nombre ?? "Consumidor Final";
+        var subtotalLineas = venta.DetalleVentas.Sum(d => d.Total);
+        var metodo = (pago?.TipoPago ?? "EFECTIVO").ToUpperInvariant();
+        var fechaPie = pago?.FechaPago ?? venta.Fecha;
 
-        // 2. Crear el PDF
+        var logoPath = Path.Combine(_env.WebRootPath ?? "", "images", "logo.png");
+        var tieneLogo = File.Exists(logoPath);
+
+        const string fuenteTicket = Fonts.Courier;
+        const int anchoGuion = 38;
+
+        string Guiones() => new string('-', anchoGuion);
+
         var document = Document.Create(container =>
         {
-            // Tamaño Rollo 80mm
             container.Page(page =>
             {
-                page.Margin(15);
-                page.ContinuousSize(226); // Aprox 80mm
-                page.DefaultTextStyle(x => x.FontSize(9).FontFamily(Fonts.Arial));
+                page.Margin(12);
+                page.ContinuousSize(226);
+                page.DefaultTextStyle(x => x.FontSize(8).FontFamily(fuenteTicket));
 
                 page.Content().Column(col =>
                 {
-                    // === CABECERA ===
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
-                    col.Item().PaddingVertical(5).AlignCenter().Text(nombreTienda).Bold().FontSize(12);
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
-
-                    col.Item().PaddingTop(5).Text($"TK: {venta.Numero} | {venta.Fecha:dd/MM/yy} | {venta.Fecha:HH:mm} | CAJERO: {nombreCajero}").FontSize(8);
-                    col.Item().PaddingBottom(5).Text($"CLIENTE: {nombreCliente}").FontSize(8);
-                    
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
-
-                    // === TABLA HEADER ===
-                    col.Item().PaddingVertical(2).PaddingBottom(2).Row(r =>
+                    // === Logo + nombre tienda ===
+                    if (tieneLogo)
                     {
-                        r.RelativeItem().Text("DESCRIPCIÓN").Bold().FontSize(8);
-                        r.ConstantItem(30).AlignCenter().Text("CANT").Bold().FontSize(8);
-                        r.ConstantItem(50).AlignRight().Text("TOTAL").Bold().FontSize(8);
+                        col.Item().AlignCenter().MaxWidth(110).Image(logoPath).FitArea();
+                        col.Item().PaddingTop(4).AlignCenter().Text("Sistema de Tienda").Bold().FontSize(10).FontFamily(fuenteTicket);
+                    }
+                    else
+                    {
+                        col.Item().AlignCenter().Text("SISTEMA DE TIENDA").Bold().FontSize(11).FontFamily(fuenteTicket);
+                    }
+
+                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+
+                    // === Metadatos (etiqueta izq / valor der) ===
+                    FilaEtiquetaValor(col, "RECIBO:", venta.Numero, fuenteTicket);
+                    FilaEtiquetaValor(col, "FECHA:", $"{venta.Fecha:dd/MM/yyyy HH:mm}", fuenteTicket);
+                    FilaEtiquetaValor(col, "CAJERO:", nombreCajero, fuenteTicket);
+                    FilaEtiquetaValor(col, "CLIENTE:", nombreCliente, fuenteTicket);
+
+                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+
+                    // === Cabecera tabla ===
+                    col.Item().Row(r =>
+                    {
+                        r.ConstantItem(28).Text("CANT").Bold();
+                        r.RelativeItem().PaddingLeft(4).Text("PRODUCTO").Bold();
+                        r.ConstantItem(58).AlignRight().Text("PRECIO").Bold();
                     });
-                    
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
 
-                    // === ITEMS ===
-                    col.Item().PaddingVertical(5).Column(itemsCol =>
+                    col.Item().PaddingVertical(2).LineHorizontal(0.5f).LineColor(Colors.Black);
+
+                    // === Ítems ===
+                    foreach (var det in venta.DetalleVentas)
                     {
-                        foreach (var det in venta.DetalleVentas)
+                        var varianteTalla = det.ProductoVariante?.Talla;
+                        var variacionTxt = varianteTalla != null ? $" ({varianteTalla})" : "";
+                        var nombreP = $"{det.Producto?.Nombre}{variacionTxt}";
+
+                        col.Item().PaddingVertical(3).Row(r =>
                         {
-                            var varianteTalla = det.ProductoVariante?.Talla;
-                            var variacionTxt = varianteTalla != null ? $" ({varianteTalla})" : "";
-                            var nombreP = $"{det.Producto?.Nombre}{variacionTxt}";
+                            r.ConstantItem(28).AlignCenter().Text(det.Cantidad.ToString());
+                            r.RelativeItem().PaddingLeft(4).Text(Truncar(nombreP, 28));
+                            r.ConstantItem(58).AlignRight().Text($"C${det.Total:N2}");
+                        });
+                    }
 
-                            itemsCol.Item().Row(r =>
-                            {
-                                r.RelativeItem().Text(nombreP).FontSize(8);
-                                r.ConstantItem(30).AlignCenter().Text(det.Cantidad.ToString()).FontSize(8);
-                                r.ConstantItem(50).AlignRight().Text($"C$ {det.Total:N2}").FontSize(8);
-                            });
-                        }
+                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+
+                    // === Subtotal / Total ===
+                    col.Item().Row(r =>
+                    {
+                        r.RelativeItem().Text("SUBTOTAL:").Bold();
+                        r.ConstantItem(70).AlignRight().Text($"C${subtotalLineas:N2}").Bold();
                     });
 
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
-
-                    // === TOTALES ===
-                    col.Item().PaddingVertical(5).Row(r =>
+                    col.Item().PaddingTop(4).Row(r =>
                     {
                         r.RelativeItem().Text("TOTAL A PAGAR:").Bold().FontSize(9);
-                        r.ConstantItem(70).AlignRight().Text($"C$ {venta.Total:N2}").Bold().FontSize(9);
+                        r.ConstantItem(70).AlignRight().Text($"C${venta.Total:N2}").Bold().FontSize(9);
                     });
 
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
+                    col.Item().PaddingTop(6).Text($"MÉTODO: {metodo}");
 
-                    // === METODO DE PAGO E IVA ===
-                    var metodo = pago?.TipoPago ?? "EFECTIVO";
-                    col.Item().PaddingVertical(5).Text($"MÉTODO DE PAGO: {metodo.ToUpper()}").FontSize(8);
+                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
 
-                    // Calculando el IVA base 15% que ya está incluido en los precios
-                    // Monto = Neto * 1.15 => Neto = Monto / 1.15 => IVA = Monto - Neto
-                    var totalBruto = venta.Total;
-                    var subtotalNeto = totalBruto / 1.15m;
-                    var ivaMonto = totalBruto - subtotalNeto;
-
-                    col.Item().Text($"* IVA (15%) Incluido: C$ {ivaMonto:N2}").FontSize(8);
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
-
-                    // === PIE ===
-                    col.Item().PaddingTop(5).AlignCenter().Text("¡GRACIAS POR SU PREFERENCIA!").Bold().FontSize(8);
-                    col.Item().AlignCenter().Text("\"DIOS BENDIGA SU DÍA\"").FontSize(8);
-                    col.Item().LineHorizontal(1).LineColor(Colors.Black);
+                    // === Pie ===
+                    col.Item().AlignCenter().Text("¡Gracias por su preferencia!").Bold().FontSize(8);
+                    col.Item().PaddingTop(4).AlignCenter().Text($"{fechaPie:dd/MM/yyyy HH:mm:ss}").FontSize(7);
                 });
             });
         });
 
-        var bytes = document.GeneratePdf();
-        return bytes;
+        return document.GeneratePdf();
+    }
+
+    private static void FilaEtiquetaValor(ColumnDescriptor col, string etiqueta, string valor, string font)
+    {
+        col.Item().PaddingVertical(1).Row(r =>
+        {
+            r.ConstantItem(72).Text(etiqueta).FontFamily(font);
+            r.RelativeItem().AlignRight().Text(valor).FontFamily(font);
+        });
+    }
+
+    private static string Truncar(string texto, int max)
+    {
+        if (string.IsNullOrEmpty(texto)) return "";
+        return texto.Length <= max ? texto : texto[..(max - 3)] + "...";
     }
 }
