@@ -42,8 +42,8 @@ public class R2StorageService : IStorageService
             Key = key,
             InputStream = fileStream,
             ContentType = contentType,
-            // R2 no usa ACLs tradicionales de S3 para acceso público, 
-            // se configura a nivel de bucket/dominio en Cloudflare.
+            // R2 no implementa STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER; el SDK usa firma de payload en streaming.
+            DisablePayloadSigning = true
         };
 
         await _s3Client.PutObjectAsync(request);
