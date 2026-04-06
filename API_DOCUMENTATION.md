@@ -176,7 +176,25 @@ La lógica de negocio exige **caja abierta** para registrar ventas y cobros (ver
 |--------|------|--------|
 | `GET` | `/api/v1/reportes/resumen-ventas` | `exportar=true` → Excel. |
 | `GET` | `/api/v1/reportes/resumen-ventas/detalle` | Lista de **tickets** (una fila por venta): total cobrado (neto), subtotal líneas, cantidad de líneas. |
-| `GET` | `/api/v1/reportes/ventas/{id}/ticket-detalle` | **Un solo ticket** con todas las líneas (`producto`, `cantidad`, `precio`, subtotales). Solo ventas cobradas. |
+| `GET` | `/api/v1/reportes/ventas/{id}/ticket-detalle` | **Un solo ticket** con `lineas[]`. Cada línea incluye `productoNombre`, `codigoProducto`, `talla`, `cantidad`, `precioUnitario`, `subtotal`, `totalLinea`. Respuesta estándar `ApiResponse` → `data`. Solo ventas cobradas. |
+
+**Ejemplo `data.lineas` (fragmento):**
+
+```json
+[
+  {
+    "productoId": 2,
+    "codigoProducto": "RO-0001",
+    "productoNombre": "Camisa roja",
+    "productoVarianteId": null,
+    "talla": null,
+    "cantidad": 1,
+    "precioUnitario": 120.0,
+    "subtotal": 120.0,
+    "totalLinea": 120.0
+  }
+]
+```
 | `GET` | `/api/v1/reportes/ventas-por-categoria` | `exportar=true` → Excel. |
 | `GET` | `/api/v1/reportes/productos-top` | Parámetro `top`; `exportar=true` → Excel. |
 

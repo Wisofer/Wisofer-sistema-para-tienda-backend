@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SistemaDeTienda.Services.IServices;
 
 public interface IReporteService
@@ -95,8 +97,14 @@ public class VentaTicketCompletoReporte
 public class VentaLineaReporte
 {
     public int ProductoId { get; set; }
+
+    [JsonPropertyName("codigoProducto")]
     public string CodigoProducto { get; set; } = "";
+
+    /// <summary>Nombre legible para UI; el JSON expone <c>productoNombre</c> (no <c>nombreProducto</c>).</summary>
+    [JsonPropertyName("productoNombre")]
     public string NombreProducto { get; set; } = "";
+
     public int? ProductoVarianteId { get; set; }
     public string? Talla { get; set; }
     public int Cantidad { get; set; }
