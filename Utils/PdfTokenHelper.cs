@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 /// <summary>
 /// Helper para generar y validar tokens seguros para descarga pública de PDFs

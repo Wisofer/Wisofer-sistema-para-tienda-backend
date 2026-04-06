@@ -1,6 +1,6 @@
-using BarRestPOS.Models.Entities;
+using SistemaDeTienda.Models.Entities;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 /// <summary>
 /// Totales para arqueo / preview de cierre. Alineado con <see cref="Pago.Monto"/> (neto cobrado en C$).

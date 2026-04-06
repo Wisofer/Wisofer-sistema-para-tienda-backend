@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/william/Documentos/aplicaciones/BarRestPOS/TempDbCleaner/TempDbCleaner.csproj": {}
+    "/home/william/Documentos/aplicaciones/SistemaDeTienda/TempDbCleaner/TempDbCleaner.csproj": {}
   },
   "projects": {
-    "/home/william/Documentos/aplicaciones/BarRestPOS/TempDbCleaner/TempDbCleaner.csproj": {
+    "/home/william/Documentos/aplicaciones/SistemaDeTienda/TempDbCleaner/TempDbCleaner.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/william/Documentos/aplicaciones/BarRestPOS/TempDbCleaner/TempDbCleaner.csproj",
+        "projectUniqueName": "/home/william/Documentos/aplicaciones/SistemaDeTienda/TempDbCleaner/TempDbCleaner.csproj",
         "projectName": "TempDbCleaner",
-        "projectPath": "/home/william/Documentos/aplicaciones/BarRestPOS/TempDbCleaner/TempDbCleaner.csproj",
+        "projectPath": "/home/william/Documentos/aplicaciones/SistemaDeTienda/TempDbCleaner/TempDbCleaner.csproj",
         "packagesPath": "/home/william/.nuget/packages/",
-        "outputPath": "/home/william/Documentos/aplicaciones/BarRestPOS/TempDbCleaner/obj/",
+        "outputPath": "/home/william/Documentos/aplicaciones/SistemaDeTienda/TempDbCleaner/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/william/.nuget/NuGet/NuGet.Config"

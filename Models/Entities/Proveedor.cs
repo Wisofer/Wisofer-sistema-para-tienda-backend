@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BarRestPOS.Models.Entities;
+namespace SistemaDeTienda.Models.Entities;
 
 /// <summary>
 /// Representa un proveedor de productos

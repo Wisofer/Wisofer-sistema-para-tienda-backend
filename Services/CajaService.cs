@@ -1,11 +1,11 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Models.Api;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Models.Api;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class CajaService : ICajaService
 {

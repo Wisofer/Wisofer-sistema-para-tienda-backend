@@ -1,4 +1,4 @@
-namespace BarRestPOS.Services.IServices;
+namespace SistemaDeTienda.Services.IServices;
 
 public interface IDashboardService
 {

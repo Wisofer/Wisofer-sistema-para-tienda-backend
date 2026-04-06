@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
-using BarRestPOS.Models.Api;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
+using SistemaDeTienda.Models.Api;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class UsuarioService : IUsuarioService
 {

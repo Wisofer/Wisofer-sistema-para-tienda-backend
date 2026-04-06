@@ -1,10 +1,10 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class InventarioService : IInventarioService
 {

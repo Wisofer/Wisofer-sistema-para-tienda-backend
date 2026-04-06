@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("BarRestPOS")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("SistemaDeTienda")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyProductAttribute("BarRestPOS")]
-[assembly: System.Reflection.AssemblyTitleAttribute("BarRestPOS")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e20ef6878af7404d6a737fe6e8c5adc69646ddf8")]
+[assembly: System.Reflection.AssemblyProductAttribute("SistemaDeTienda")]
+[assembly: System.Reflection.AssemblyTitleAttribute("SistemaDeTienda")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.

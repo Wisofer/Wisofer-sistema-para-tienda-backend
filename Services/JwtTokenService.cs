@@ -2,10 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using BarRestPOS.Services.IServices;
+using SistemaDeTienda.Services.IServices;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class JwtTokenService : IJwtTokenService
 {

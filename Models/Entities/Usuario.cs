@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BarRestPOS.Models.Entities;
+namespace SistemaDeTienda.Models.Entities;
 
 [Table("Usuarios")]
 public class Usuario

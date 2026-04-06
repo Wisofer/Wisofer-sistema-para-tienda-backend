@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace BarRestPOS.Services.IServices;
+namespace SistemaDeTienda.Services.IServices;
 
 public interface IJwtTokenService
 {

@@ -1,6 +1,6 @@
-using BarRestPOS.Models.Entities;
+using SistemaDeTienda.Models.Entities;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 /// <summary>
 /// Totales de cobro por pedido: <see cref="Venta.Monto"/> = consumo (subtotal líneas);

@@ -1,6 +1,6 @@
-using BarRestPOS.Models.Entities;
+using SistemaDeTienda.Models.Entities;
 
-namespace BarRestPOS.Services.IServices;
+namespace SistemaDeTienda.Services.IServices;
 
 public interface IInventarioService
 {

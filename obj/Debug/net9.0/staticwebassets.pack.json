@@ -29,24 +29,24 @@
       "PackagePath": "staticwebassets/sounds/success.mp3"
     },
     {
-      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.BarRestPOS.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.SistemaDeTienda.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },
     {
-      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.BarRestPOS.Microsoft.AspNetCore.StaticWebAssets.props",
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.SistemaDeTienda.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },
     {
-      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.build.BarRestPOS.props",
-      "PackagePath": "build\\BarRestPOS.props"
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.build.SistemaDeTienda.props",
+      "PackagePath": "build\\SistemaDeTienda.props"
     },
     {
-      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildMultiTargeting.BarRestPOS.props",
-      "PackagePath": "buildMultiTargeting\\BarRestPOS.props"
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildMultiTargeting.SistemaDeTienda.props",
+      "PackagePath": "buildMultiTargeting\\SistemaDeTienda.props"
     },
     {
-      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildTransitive.BarRestPOS.props",
-      "PackagePath": "buildTransitive\\BarRestPOS.props"
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildTransitive.SistemaDeTienda.props",
+      "PackagePath": "buildTransitive\\SistemaDeTienda.props"
     }
   ],
   "ElementsToRemove": []

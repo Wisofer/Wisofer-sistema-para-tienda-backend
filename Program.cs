@@ -1,9 +1,9 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Api;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Api;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

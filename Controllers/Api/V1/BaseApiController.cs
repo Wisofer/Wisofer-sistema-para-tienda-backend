@@ -1,7 +1,7 @@
-using BarRestPOS.Models.Api;
+using SistemaDeTienda.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BarRestPOS.Controllers.Api.V1;
+namespace SistemaDeTienda.Controllers.Api.V1;
 
 [ApiController]
 public abstract class BaseApiController : ControllerBase

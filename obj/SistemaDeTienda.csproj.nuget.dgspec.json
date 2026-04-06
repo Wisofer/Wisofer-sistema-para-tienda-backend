@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "/home/william/Documentos/aplicaciones/sistema de tienda backend/BarRestPOS.csproj": {}
+    "/home/william/Documentos/aplicaciones/sistema de tienda backend/SistemaDeTienda.csproj": {}
   },
   "projects": {
-    "/home/william/Documentos/aplicaciones/sistema de tienda backend/BarRestPOS.csproj": {
+    "/home/william/Documentos/aplicaciones/sistema de tienda backend/SistemaDeTienda.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/william/Documentos/aplicaciones/sistema de tienda backend/BarRestPOS.csproj",
-        "projectName": "BarRestPOS",
-        "projectPath": "/home/william/Documentos/aplicaciones/sistema de tienda backend/BarRestPOS.csproj",
+        "projectUniqueName": "/home/william/Documentos/aplicaciones/sistema de tienda backend/SistemaDeTienda.csproj",
+        "projectName": "SistemaDeTienda",
+        "projectPath": "/home/william/Documentos/aplicaciones/sistema de tienda backend/SistemaDeTienda.csproj",
         "packagesPath": "/home/william/.nuget/packages/",
         "outputPath": "/home/william/Documentos/aplicaciones/sistema de tienda backend/obj/",
         "projectStyle": "PackageReference",

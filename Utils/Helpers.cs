@@ -1,7 +1,7 @@
 using System.Text.Json;
-using BarRestPOS.Models.Entities;
+using SistemaDeTienda.Models.Entities;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 public static class Helpers
 {

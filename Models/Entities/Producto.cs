@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BarRestPOS.Models.Entities;
+namespace SistemaDeTienda.Models.Entities;
 
 /// <summary>
 /// Producto de la tienda de ropa (Camisas, Pantalones, Accesorios, etc.)

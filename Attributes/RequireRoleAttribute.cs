@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
-namespace BarRestPOS.Attributes;
+namespace SistemaDeTienda.Attributes;
 
 /// <summary>
 /// Atributo personalizado para requerir un rol específico.

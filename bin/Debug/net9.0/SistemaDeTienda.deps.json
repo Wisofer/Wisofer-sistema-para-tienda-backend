@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v9.0": {
-      "BarRestPOS/1.0.0": {
+      "SistemaDeTienda/1.0.0": {
         "dependencies": {
           "AWSSDK.S3": "4.0.20.3",
           "EPPlus": "7.5.2",
@@ -17,7 +17,7 @@
           "Swashbuckle.AspNetCore": "10.1.7"
         },
         "runtime": {
-          "BarRestPOS.dll": {}
+          "SistemaDeTienda.dll": {}
         }
       },
       "AWSSDK.Core/4.0.3.27": {
@@ -864,7 +864,7 @@
     }
   },
   "libraries": {
-    "BarRestPOS/1.0.0": {
+    "SistemaDeTienda/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

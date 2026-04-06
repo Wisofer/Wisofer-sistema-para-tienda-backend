@@ -1,4 +1,4 @@
-namespace BarRestPOS.Models.Api;
+namespace SistemaDeTienda.Models.Api;
 
 public class ApiResponse<T>
 {

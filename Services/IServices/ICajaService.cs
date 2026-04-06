@@ -1,7 +1,7 @@
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Models.Api;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Models.Api;
 
-namespace BarRestPOS.Services.IServices;
+namespace SistemaDeTienda.Services.IServices;
 
 public interface ICajaService
 {

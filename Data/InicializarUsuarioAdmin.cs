@@ -1,9 +1,9 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace BarRestPOS.Data;
+namespace SistemaDeTienda.Data;
 
 public static class InicializarUsuarioAdmin
 {

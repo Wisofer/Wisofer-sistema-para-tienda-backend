@@ -1,10 +1,10 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using BarRestPOS.Services.IServices;
+using SistemaDeTienda.Services.IServices;
 using Microsoft.Extensions.Configuration;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class R2StorageService : IStorageService
 {

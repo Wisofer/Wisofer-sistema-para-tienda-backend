@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BarRestPOS.Migrations
+namespace SistemaDeTienda.Migrations
 {
     /// <inheritdoc />
     public partial class InicialTiendaRopa : Migration

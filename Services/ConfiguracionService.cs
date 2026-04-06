@@ -1,11 +1,11 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class ConfiguracionService : IConfiguracionService
 {

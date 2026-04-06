@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 public static class FormHelper
 {

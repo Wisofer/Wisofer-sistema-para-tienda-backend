@@ -1,10 +1,10 @@
-using BarRestPOS.Models.Api;
-using BarRestPOS.Services.IServices;
-using BarRestPOS.Utils;
+using SistemaDeTienda.Models.Api;
+using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BarRestPOS.Controllers.Api.V1;
+namespace SistemaDeTienda.Controllers.Api.V1;
 
 [Authorize]
 [Route("api/v1/caja")]

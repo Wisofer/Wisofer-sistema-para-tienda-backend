@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UY09BGH2eIE=",
+  "dgSpecHash": "foCj5t7F/Tc=",
   "success": true,
-  "projectFilePath": "/home/william/Documentos/aplicaciones/sistema de tienda backend/BarRestPOS.csproj",
+  "projectFilePath": "/home/william/Documentos/aplicaciones/sistema de tienda backend/SistemaDeTienda.csproj",
   "expectedPackageFiles": [
     "/home/william/.nuget/packages/awssdk.core/4.0.3.27/awssdk.core.4.0.3.27.nupkg.sha512",
     "/home/william/.nuget/packages/awssdk.s3/4.0.20.3/awssdk.s3.4.0.20.3.nupkg.sha512",

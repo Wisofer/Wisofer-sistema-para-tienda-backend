@@ -3,7 +3,7 @@ using OfficeOpenXml.Style;
 using System.Drawing;
 using System.Reflection;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 /// <summary>
 /// Servicio para exportar datos a Excel (Retail Optimized)

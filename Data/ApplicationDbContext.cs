@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using BarRestPOS.Models.Entities;
+using SistemaDeTienda.Models.Entities;
 
-namespace BarRestPOS.Data;
+namespace SistemaDeTienda.Data;
 
 public class ApplicationDbContext : DbContext
 {

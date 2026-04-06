@@ -1,9 +1,9 @@
-using BarRestPOS.Data;
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services.IServices;
+using SistemaDeTienda.Data;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 
-namespace BarRestPOS.Services;
+namespace SistemaDeTienda.Services;
 
 public class CategoriaProductoService : ICategoriaProductoService
 {

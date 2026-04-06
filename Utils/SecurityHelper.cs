@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 /// <summary>
 /// Helper centralizado para operaciones de seguridad y autenticación.

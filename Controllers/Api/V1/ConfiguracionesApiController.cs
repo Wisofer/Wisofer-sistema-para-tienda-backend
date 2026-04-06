@@ -1,9 +1,9 @@
-using BarRestPOS.Models.Entities;
-using BarRestPOS.Services.IServices;
+using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BarRestPOS.Controllers.Api.V1;
+namespace SistemaDeTienda.Controllers.Api.V1;
 
 [Authorize]
 [Route("api/v1/configuraciones")]

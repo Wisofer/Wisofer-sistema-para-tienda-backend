@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BarRestPOS.Utils;
+namespace SistemaDeTienda.Utils;
 
 public static class PasswordHelper
 {
