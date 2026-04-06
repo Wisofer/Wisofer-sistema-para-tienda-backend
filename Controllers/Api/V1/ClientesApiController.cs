@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace SistemaDeTienda.Controllers.Api.V1;
 
 [Route("api/v1/clientes")]
-[ApiController]
 [Authorize]
 public class ClientesApiController : BaseApiController
 {
@@ -22,15 +21,15 @@ public class ClientesApiController : BaseApiController
     public IActionResult GetAll([FromQuery] string? search)
     {
         var clientes = string.IsNullOrEmpty(search) ? _clienteService.ObtenerTodos() : _clienteService.Buscar(search);
-        return Ok(new ApiResponse<object> { Success = true, Data = clientes });
+        return OkResponse(clientes);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public IActionResult GetById(int id)
     {
         var cliente = _clienteService.ObtenerPorId(id);
-        if (cliente == null) return NotFound(new ApiResponse<object> { Success = false, Message = "Cliente no encontrado." });
-        return Ok(new ApiResponse<object> { Success = true, Data = cliente });
+        if (cliente == null) return FailResponse("Cliente no encontrado.", StatusCodes.Status404NotFound);
+        return OkResponse(cliente);
     }
 
     [HttpPost]
@@ -39,44 +38,48 @@ public class ClientesApiController : BaseApiController
         try
         {
             var nuevo = _clienteService.Crear(cliente);
-            return CreatedAtAction(nameof(GetById), new { id = nuevo.Id }, new ApiResponse<object> { Success = true, Data = nuevo });
+            return CreatedAtAction(nameof(GetById), new { id = nuevo.Id }, new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Cliente creado.",
+                Data = nuevo
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiResponse<object> { Success = false, Message = ex.Message });
+            return FailResponse(ex.Message);
         }
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public IActionResult Update(int id, [FromBody] Cliente cliente)
     {
         try
         {
             cliente.Id = id;
             var actualizado = _clienteService.Actualizar(cliente);
-            return Ok(new ApiResponse<object> { Success = true, Data = actualizado });
+            return OkResponse(actualizado, "Cliente actualizado.");
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiResponse<object> { Success = false, Message = ex.Message });
+            return FailResponse(ex.Message);
         }
     }
 
     [Authorize(Policy = "Admin")]
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public IActionResult Delete(int id)
     {
         try
         {
             if (_clienteService.Eliminar(id))
-            {
-                return Ok(new ApiResponse<object> { Success = true, Message = "Cliente eliminado correctamente." });
-            }
-            return NotFound(new ApiResponse<object> { Success = false, Message = "Cliente no encontrado." });
+                return OkResponse("Cliente eliminado correctamente.");
+
+            return FailResponse("Cliente no encontrado.", StatusCodes.Status404NotFound);
         }
         catch (Exception ex)
         {
-            return BadRequest(new ApiResponse<object> { Success = false, Message = ex.Message });
+            return FailResponse(ex.Message);
         }
     }
 }

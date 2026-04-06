@@ -7,6 +7,7 @@ using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.Text;
 
 // Configurar Npgsql para manejar DateTime correctamente con PostgreSQL
@@ -19,17 +20,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new() { Title = "Clothing Store POS API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Clothing Store POS API", Version = "v1" });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Bearer. Obtener con POST /api/v1/auth/login y usar: Authorization: Bearer {token}"
+    });
 });
 
 // Configurar URLs en minúsculas
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-// Configurar Entity Framework con PostgreSQL (Neon)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
+// Configurar Entity Framework con PostgreSQL (DATABASE_URL / POSTGRES_URL / DefaultConnection)
+var connectionString = PostgresConnectionResolver.Resolve(builder.Configuration);
+if (string.IsNullOrWhiteSpace(connectionString))
 {
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    throw new InvalidOperationException(
+        "Base de datos no configurada. Defina DATABASE_URL o POSTGRES_URL, o ConnectionStrings:DefaultConnection en configuración.");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -51,8 +62,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configurar JWT
-var jwtSecret = builder.Configuration["JwtSettings:SecretKey"] ?? "ClaveSecretaTemporalParaDesarrollo2024";
+// Configurar JWT (sin clave por defecto en código)
+var jwtSecret = builder.Configuration["JwtSettings:SecretKey"];
+if (string.IsNullOrWhiteSpace(jwtSecret))
+{
+    throw new InvalidOperationException("JwtSettings:SecretKey no configurado en appsettings.json.");
+}
+
+if (builder.Environment.IsProduction() && jwtSecret.Length < 32)
+{
+    throw new InvalidOperationException("JwtSettings:SecretKey debe tener al menos 32 caracteres en producción.");
+}
+
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "ClothingStorePOS";
 var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? "ClothingStorePOSUsers";
 var jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
@@ -146,6 +167,18 @@ else
 }
 
 app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("X-Frame-Options", "DENY");
+        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+        await next();
+    });
+}
+
 app.UseRouting();
 
 // CORS debe ir entre UseRouting y UseAuthentication

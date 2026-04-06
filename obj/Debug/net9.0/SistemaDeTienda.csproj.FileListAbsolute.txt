@@ -1,4 +1,3 @@
-/home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/appsettings.Development.json
 /home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/appsettings.json
 /home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/test_output.json
 /home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/SistemaDeTienda.staticwebassets.runtime.json

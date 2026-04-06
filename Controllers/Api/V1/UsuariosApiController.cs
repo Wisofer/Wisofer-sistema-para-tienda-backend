@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize(Policy = "Administrador")]
+[Authorize(Policy = "Admin")]
 [Route("api/v1/usuarios")]
 public class UsuariosApiController : BaseApiController
 {
@@ -92,10 +92,10 @@ public class UsuariosApiController : BaseApiController
             var usuario = new Usuario
             {
                 Id = id,
-                NombreUsuario = request.NombreUsuario?.Trim(),
-                NombreCompleto = request.NombreCompleto?.Trim(),
-                Rol = request.Rol?.Trim(),
-                Contrasena = request.Contrasena, // El servicio se encarga de actualizar solo si no es nula
+                NombreUsuario = request.NombreUsuario?.Trim() ?? string.Empty,
+                NombreCompleto = request.NombreCompleto?.Trim() ?? string.Empty,
+                Rol = string.IsNullOrWhiteSpace(request.Rol) ? SD.RolNormal : request.Rol.Trim(),
+                Contrasena = request.Contrasena ?? string.Empty,
                 Activo = request.Activo
             };
 

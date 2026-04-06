@@ -37,6 +37,7 @@ public class ProductosApiController : BaseApiController
     {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 50;
+        if (pageSize > 200) pageSize = 200;
 
         var query = _context.Productos
             .AsNoTracking()

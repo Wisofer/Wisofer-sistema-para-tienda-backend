@@ -38,7 +38,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpPut("tipo-cambio")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public IActionResult UpdateTipoCambio([FromBody] UpdateTipoCambioRequest request)
     {
         if (request.TipoCambioDolar <= 0) return FailResponse("Tipo de cambio inválido.");
@@ -52,7 +52,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpPut("{clave}")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public IActionResult Upsert(string clave, [FromBody] UpsertConfiguracionRequest request)
     {
         if (string.IsNullOrWhiteSpace(clave)) return FailResponse("Clave inválida.");
@@ -104,7 +104,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpPost("plantillas-whatsapp")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> CrearPlantillaWhatsApp([FromBody] PlantillaWhatsAppUpsertRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Nombre) || string.IsNullOrWhiteSpace(request.Mensaje))
@@ -130,7 +130,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpPut("plantillas-whatsapp/{id:int}")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> ActualizarPlantillaWhatsApp(int id, [FromBody] PlantillaWhatsAppUpsertRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Nombre) || string.IsNullOrWhiteSpace(request.Mensaje))
@@ -157,7 +157,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpDelete("plantillas-whatsapp/{id:int}")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> EliminarPlantillaWhatsApp(int id)
     {
         try
@@ -174,7 +174,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpPatch("plantillas-whatsapp/{id:int}/marcar-default")]
-    [Authorize(Policy = "Administrador")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> MarcarPlantillaWhatsAppDefault(int id)
     {
         try

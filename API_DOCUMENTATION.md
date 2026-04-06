@@ -1,122 +1,268 @@
-# 📘 Guía Técnica 360°: Retail POS Backend
+# Documentación técnica — Backend Sistema de Tienda (POS)
 
-Esta es la documentación oficial definitiva para la integración del sistema. Cubre todos los módulos operativos, analíticos y de configuración.
-
----
-
-## 🔐 1. Núcleo, Seguridad y Perfiles
-
-El sistema utiliza **JSON Web Tokens (JWT)** con una estrategia de **Rotación de Refresh Tokens** para máxima seguridad.
-
-### 1.1 Iniciar Sesión (Login)
-- **URL**: `POST /api/v1/auth/login`
-- **Body**: 
-  ```json
-  {
-    "nombreUsuario": "admin",
-    "contrasena": "admin"
-  }
-  ```
-- **Respuesta**: Token de acceso y Refresh Token.
-
-### 1.2 Sesión y Perfil (`/me`)
-- **URL**: `GET /api/v1/auth/me`
-- **Uso**: Obtiene los datos del usuario actual autenticado (ID, Nombre, Rol).
-
-### 1.3 Administración de Usuarios (Admin Only) 👥
-- **URL**: `GET /api/v1/usuarios`
-- **Funciones**: CRUD completo de cuentas. Permite activar/desactivar empleados y asignar roles (`Administrador`, `Cajero`).
+API REST en **ASP.NET Core 9** con **PostgreSQL**, **JWT + refresh tokens**, **Entity Framework Core** y almacenamiento de imágenes opcional (**Cloudflare R2** compatible S3).
 
 ---
 
-## 📈 2. Dashboard y Analítica Comercial
+## 1. Arquitectura
 
-Módulo diseñado para renderizar la salud del negocio en tiempo real.
+| Capa | Ubicación |
+|------|-----------|
+| Controladores | `Controllers/Api/V1/*ApiController.cs` |
+| Servicios | `Services/` e interfaces en `Services/IServices/` |
+| Datos | `Data/ApplicationDbContext.cs`, `Migrations/` |
+| Modelos API | `Models/Api/` |
+| Entidades | `Models/Entities/` |
 
-### 2.1 KPIs y Gráficas
-- **URL**: `GET /api/v1/dashboard/resumen`
-- **Query Params**: `desde` (YYYY-MM-DD), `hasta`, `topProductos` (default 5).
-- **Datos Devueltos**:
-  - `kpis`: Montos de venta hoy, ticket promedio, valor del inventario.
-  - `serieVentas`: Datos para gráficas de barras (Fecha, Monto, Tickets).
-  - `productosStockBajoLista`: Alertas inmediatas para reposición.
+**Prefijo de rutas:** todas las APIs están bajo `api/v1/...` (URLs en minúsculas).
 
----
+**Formato de respuesta estándar** (`ApiResponse<T>`):
 
-## 👗 3. Inventario y Catálogos Retail
-
-### 3.1 Productos (¡Soporte R2!) 🖼️
-Gestión de productos con carga de imágenes a Cloudflare R2 vía `FormData`.
-- **URL**: `POST /api/v1/productos`
-- **Campos**: `Codigo` (SKU), `Nombre`, `Precio`, `PrecioCompra`, `Talla`, `StockActual`, `StockMinimo`, `Imagen` (Binario).
-
-### 3.2 Categorías y Proveedores
-- **Categorías**: `GET /api/v1/catalogos/categorias-producto`. Incluye `cantidadProductos`.
-- **Proveedores**: `GET /api/v1/catalogos/proveedores`. Directorio de contactos para compras.
-
----
-
-## 💰 4. Operativa de Tienda: Caja y POS
-
-El flujo de ventas requiere una **Caja Abierta** iniciada por un usuario autorizado.
-
-### 4.1 Ciclo de Caja
-1. **Estado Actual**: `GET /api/v1/caja/estado` (Retorna si está `Abierta` o `Cerrada`).
-2. **Apertura**: `POST /api/v1/caja/apertura` (Envía `montoInicial`).
-3. **Cierre (Preview)**: `GET /api/v1/caja/cierre/preview` (Muestra el arqueo esperado vs real).
-4. **Cierre (Final)**: `POST /api/v1/caja/cierre`.
-
-### 4.2 Punto de Venta (El "Apretón de Manos") 🤝
-1. **Crear Ticket**: `POST /api/v1/pos/ventas` -> Registra los productos y descuenta stock. Devuelve `id` de la venta.
-2. **Procesar Pago**: `POST /api/v1/ventas/procesar-pago` -> Finaliza la transacción.
-   - **Monedas**: Soporta `Cordoba` y `Dolar` (Calcula el vuelto automáticamente en Córdobas).
-
----
-
-## 👥 5. CRM: Gestión de Clientes
-- **URL**: `GET /api/v1/clientes?search=...`
-- **Uso**: Registro de clientes para facturación personalizada. Permite buscar por nombre, teléfono o RUC/Cédula.
-
----
-
-## 📊 6. Reportes Premium (Excel & JSON)
-
-Cualquier reporte analítico permite exportación a Excel profesional añadiendo `?exportar=true`.
-
-| Endpoint | Descripción |
-| :--- | :--- |
-| `/api/v1/reportes/resumen-ventas` | Totales por día y transacciones. |
-| `/api/v1/reportes/detalle-ventas` | Desglose por producto, talla y categoría. |
-| `/api/v1/reportes/ventas-categoria` | Análisis de rendimiento por familias. |
-| `/api/v1/reportes/top-productos` | Ranking de los más vendidos. |
-
----
-
-## ⚙️ 7. Configuración de Sistema
-
-### 7.1 Tipo de Cambio Global
-- **URL**: `PUT /api/v1/configuraciones/tipo-cambio`
-- **Body**: `{"tipoCambioDolar": 36.65}`
-- **Impacto**: Afecta inmediatamente al POS para cobros en dólares.
-
-### 7.2 Marketing y WhatsApp
-- **URL**: `GET /api/v1/configuraciones/plantillas-whatsapp`
-- **Uso**: Gestiona los mensajes automáticos que se envían por WhatsApp al finalizar una venta.
-
----
-
-## 🛑 8. Protocolo de Errores Estándar
-
-Todas las respuestas fallidas siguen este formato (Código 400, 401, 403, 404):
 ```json
 {
-  "success": false,
-  "message": "Error explicativo para mostrar en el Toast/Notificación",
-  "data": null
+  "success": true,
+  "message": "OK",
+  "data": { }
 }
 ```
 
+Errores: `success: false`, `message` descriptivo, `data: null`, código HTTP acorde (`400`, `401`, `403`, `404`, `500`).
+
 ---
-> [!TIP]
-> Puedes visualizar y probar interactivamente todos los endpoints en:
-> **http://localhost:5000/swagger/index.html** (Entorno de Desarrollo).
+
+## 2. Autenticación y autorización
+
+### 2.1 JWT
+
+- **Claims:** `Name`, `NameIdentifier` (ID usuario), `Rol`, `NombreCompleto`.
+- **Cabecera:** `Authorization: Bearer {accessToken}`.
+
+### 2.2 Políticas de autorización
+
+| Política | Claim `Rol` permitido |
+|----------|------------------------|
+| `Admin` | `Administrador` |
+| `Cajero` | `Cajero`, `Administrador` |
+
+Los endpoints usan `[Authorize(Policy = "Admin")]` para operaciones administrativas (no confundir el **nombre de la política** `Admin` con el **valor del rol** en BD `Administrador`).
+
+### 2.3 Endpoints de autenticación
+
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| `POST` | `/api/v1/auth/login` | No | Login; devuelve `accessToken`, `refreshToken`, datos de usuario. |
+| `POST` | `/api/v1/auth/refresh` | No | Renueva access + refresh (rotación). |
+| `POST` | `/api/v1/auth/logout` | Sí | Revoca refresh si se envía en body. |
+| `POST` | `/api/v1/auth/revoke` | Sí | Revoca un refresh token concreto. |
+| `GET` | `/api/v1/auth/me` | Sí | Perfil del usuario autenticado. |
+
+**Validaciones login:** `nombreUsuario` y `contrasena` no vacíos.
+
+### 2.4 Usuarios (solo administrador)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/v1/usuarios` | Listado paginado (`search`, `rol`, `activo`, `page`, `pageSize` máx. 200). |
+| `POST` | `/api/v1/usuarios` | Crear usuario. |
+| `PUT` | `/api/v1/usuarios/{id}` | Actualizar usuario. |
+| `DELETE` | `/api/v1/usuarios/{id}` | Eliminar (lógico). |
+
+**Política:** `Admin`.
+
+---
+
+## 3. Inventario y catálogos
+
+### 3.1 Productos
+
+| Método | Ruta | Política | Descripción |
+|--------|------|----------|-------------|
+| `GET` | `/api/v1/productos` | Autenticado | Listado paginado (`search`, `categoriaId`, `activos`, `page`, `pageSize` máx. **200**). |
+| `GET` | `/api/v1/productos/{id}` | Autenticado | Detalle. |
+| `POST` | `/api/v1/productos` | `Admin` | Crear (`multipart/form-data`: campos + `Imagen` opcional). |
+| `PUT` | `/api/v1/productos/{id}` | `Admin` | Actualizar. |
+| `DELETE` | `/api/v1/productos/{id}` | `Admin` | Baja lógica (`Activo = false`). |
+
+**Validaciones:** nombre obligatorio; código único; si no hay código se genera automáticamente.
+
+### 3.2 Catálogos (categorías y proveedores)
+
+**Base:** `/api/v1/catalogos`
+
+| Recurso | GET lista | GET | POST | PUT | DELETE |
+|---------|-----------|-----|------|-----|--------|
+| Categorías | `/categorias-producto` | `/categorias-producto/{id}` | `Admin` | `Admin` | `Admin` |
+| Proveedores | `/proveedores` | `/proveedores/{id}` | `Admin` | `Admin` | `Admin` |
+
+Lecturas: cualquier usuario autenticado. Escrituras: `Admin`.
+
+---
+
+## 4. Dashboard
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/v1/dashboard/resumen` | KPIs, serie de ventas, top productos, categorías, stock bajo. Query: `desde`, `hasta`, `topProductos` (1–20). |
+
+**Auth:** autenticado.
+
+---
+
+## 5. Clientes (CRM)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/v1/clientes` | Lista o búsqueda (`search`). |
+| `GET` | `/api/v1/clientes/{id}` | Detalle. |
+| `POST` | `/api/v1/clientes` | Alta. |
+| `PUT` | `/api/v1/clientes/{id}` | Actualización. |
+| `DELETE` | `/api/v1/clientes/{id}` | Baja **solo** `Admin`. |
+
+Respuestas en formato `ApiResponse` unificado (incluido `201 Created` en POST con `success` / `data`).
+
+---
+
+## 6. Ventas y POS
+
+### 6.1 Caja
+
+| Método | Ruta | Política | Descripción |
+|--------|------|----------|-------------|
+| `GET` | `/api/v1/caja/estado` | Autenticado | Estado abierto/cerrado. |
+| `POST` | `/api/v1/caja/apertura` | `Admin` | Abrir caja (`montoInicial`). |
+| `GET` | `/api/v1/caja/cierre/preview` | `Admin` | Vista previa de arqueo. |
+| `POST` | `/api/v1/caja/cierre` | `Admin` | Cierre definitivo. |
+| `GET` | `/api/v1/caja/historial` | `Admin` | Historial paginado. |
+
+La lógica de negocio exige **caja abierta** para registrar ventas y cobros (ver mensajes en `VentaService`).
+
+### 6.2 Punto de venta
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/v1/pos/ventas` | Crear venta pendiente (ítems, cliente opcional). |
+
+### 6.3 Cobro y tickets
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/v1/ventas/procesar-pago` | Finalizar cobro (descuentos, moneda, método de pago). |
+| `POST` | `/api/v1/ventas/gestionar-pago` | Alias del mismo proceso. |
+| `GET` | `/api/v1/ventas/{id}/ticket` | PDF del ticket (requiere **autenticación**). |
+
+**Monedas:** `Cordobas` / `Dolares` (según constantes en `SD`).
+
+---
+
+## 7. Reportes (solo administrador)
+
+**Base:** `/api/v1/reportes` — política `Admin`.
+
+| Método | Ruta | Notas |
+|--------|------|--------|
+| `GET` | `/api/v1/reportes/resumen-ventas` | `exportar=true` → Excel. |
+| `GET` | `/api/v1/reportes/resumen-ventas/detalle` | Detalle JSON. |
+| `GET` | `/api/v1/reportes/ventas-por-categoria` | `exportar=true` → Excel. |
+| `GET` | `/api/v1/reportes/productos-top` | Parámetro `top`; `exportar=true` → Excel. |
+
+---
+
+## 8. Configuración
+
+**Base:** `/api/v1/configuraciones`
+
+| Área | Lectura | Escritura (Admin) |
+|------|---------|-------------------|
+| Listado general | `GET /` | — |
+| Tipo de cambio | `GET /tipo-cambio` | `PUT /tipo-cambio` |
+| Clave genérica | — | `PUT /{clave}` |
+| Plantillas WhatsApp | `GET/GET/{id}` | `POST`, `PUT`, `DELETE`, `PATCH .../marcar-default` |
+
+---
+
+## 9. Configuración y despliegue
+
+### 9.1 Configuración por defecto (Dokploy / despliegue sin variables)
+
+La configuración vive en **`appsettings.json`**: misma **Neon**, **JWT**, **R2** y **CORS** en local y en producción. **No hace falta** definir variables de entorno en Dokploy para que arranque (mismo criterio que otros proyectos con credenciales en archivo).
+
+Para **cambiar** dominio del frontend, otra BD o claves, edita `appsettings.json` (sección `Cors`, `ConnectionStrings`, etc.) y vuelve a desplegar.
+
+### 9.1.1 Variables de entorno opcionales (sobrescriben `appsettings.json`)
+
+Si algún día quieres secretos fuera del repo, estas tienen **prioridad** sobre el archivo:
+
+| Clave | Uso |
+|-------|-----|
+| `DATABASE_URL` o `POSTGRES_URL` | URI `postgresql://...` (sustituye `ConnectionStrings:DefaultConnection`). |
+| `ConnectionStrings__DefaultConnection` | Cadena PostgreSQL. |
+| `JwtSettings__SecretKey` | JWT (**≥ 32 caracteres** en producción si usas esta variable). |
+| `CloudflareR2__*` | Claves R2. |
+| `Cors__AllowedOrigins__0`, `__1`, … | Orígenes CORS. |
+
+### 9.2 Base de datos
+
+Aplicar migraciones antes del primer arranque:
+
+```bash
+dotnet ef database update
+```
+
+(Desde el directorio del proyecto, con herramientas `dotnet-ef` instaladas.)
+
+### 9.3 Swagger
+
+En desarrollo: `GET /swagger/index.html`. Se documenta el esquema **Bearer**; en Swagger UI usar **Authorize** y pegar el token de login.
+
+En **producción** (`ASPNETCORE_ENVIRONMENT=Production`) Swagger **no** se expone por defecto (solo pipeline de desarrollo).
+
+### 9.4 Checklist Dokploy / producción
+
+| Paso | Acción |
+|------|--------|
+| Despliegue | Construir y publicar la imagen o artefacto; **`appsettings.json`** ya incluye Neon, JWT (≥ 32 caracteres), R2 y CORS. **Variables de entorno opcionales.** |
+| Entorno | Recomendado **`ASPNETCORE_ENVIRONMENT=Production`** (Swagger desactivado, respuestas 500 genéricas). |
+| Base de datos | La **misma Neon** del repo; ejecutar **`dotnet ef database update`** la primera vez contra esa base. |
+| Nuevo dominio front | Añadir la URL en **`Cors:AllowedOrigins`** dentro de `appsettings.json` y redesplegar. |
+| Repo público | Si el repositorio es público, las credenciales en `appsettings.json` son visibles: **rotar** claves periódicamente o usar variables opcionales (§9.1.1). |
+
+---
+
+## 10. Seguridad: hallazgos y recomendaciones
+
+| Tema | Estado / recomendación |
+|------|-------------------------|
+| Políticas `Admin` vs nombre de política `Administrador` | Corregido: se usa la política registrada `Admin`. |
+| PDF de tickets | Protegido con JWT; no exponer descarga anónima por ID. |
+| Secretos en repositorio | Las credenciales están en `appsettings.json` por comodidad de despliegue; si el repo es **público**, rota claves y usa §9.1.1. |
+| HTTPS | Usar `UseHttpsRedirection` y HTTPS en producción. |
+| CORS | Limitar `AllowedOrigins` a dominios conocidos. |
+| Cabeceras | En entornos no desarrollo se envían `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`. |
+| Rate limiting | No incluido; valorar `AspNetCore.RateLimiting` frente a login y APIs públicas. |
+| Auditoría | Valorar logs estructurados y correlación de IDs de venta/usuario. |
+
+---
+
+## 11. Errores HTTP
+
+| Código | Uso típico |
+|--------|------------|
+| 400 | Validación o regla de negocio. |
+| 401 | No autenticado o token inválido. |
+| 403 | Sin permiso (rol). |
+| 404 | Recurso no encontrado. |
+| 500 | Error interno (mensaje genérico en producción). |
+
+---
+
+## 12. Stack y dependencias principales
+
+- `Microsoft.EntityFrameworkCore` + `Npgsql`  
+- `Microsoft.AspNetCore.Authentication.JwtBearer`  
+- `Swashbuckle.AspNetCore` + `Microsoft.OpenApi`  
+- `AWSSDK.S3` (R2)  
+- `EPPlus` (Excel), `QuestPDF` (PDF de tickets)
+
+---
+
+*Configuración centralizada en `appsettings.json` (Neon, JWT, R2, CORS) para despliegue en Dokploy sin variables obligatorias.*

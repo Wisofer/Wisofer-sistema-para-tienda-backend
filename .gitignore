@@ -1,0 +1,19 @@
+## .NET
+bin/
+obj/
+*.log
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+[Dd]ebug/
+[Rr]elease/
+[Bb]uild/
+[Ll]ogs/
+
+## Producción con secretos
+**/appsettings.Production.json
+
+## IDE
+.idea/
+.vs/

@@ -14,17 +14,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.4.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
     <PackageReference Include="QuestPDF" Version="2024.10.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-  </ItemGroup>
-
-  <!-- Excluir utilidades temporales del proyecto web principal -->
-  <ItemGroup>
-    <Compile Remove="TempDbCleaner/**" />
-    <EmbeddedResource Remove="TempDbCleaner/**" />
-    <Content Remove="TempDbCleaner/**" />
-    <None Remove="TempDbCleaner/**" />
   </ItemGroup>
 
 </Project>

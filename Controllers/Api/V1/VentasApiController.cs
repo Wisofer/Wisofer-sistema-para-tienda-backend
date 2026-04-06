@@ -57,7 +57,6 @@ public class VentasApiController : BaseApiController
     }
 
     [HttpGet("{id:int}/ticket")]
-    [AllowAnonymous] // Permitir descarga sin auth o con control
     public async Task<IActionResult> DescargarTicket(int id)
     {
         try

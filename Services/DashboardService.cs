@@ -102,9 +102,9 @@ public class DashboardService : IDashboardService
             .ToListAsync();
     }
 
-    private async Task<object> GenerarSerieVentasAsync(List<Venta> ventas)
+    private Task<object> GenerarSerieVentasAsync(List<Venta> ventas)
     {
-        return ventas
+        var serie = ventas
             .GroupBy(v => v.Fecha.Date)
             .Select(g => new
             {
@@ -114,6 +114,7 @@ public class DashboardService : IDashboardService
             })
             .OrderBy(x => x.Fecha)
             .ToList();
+        return Task.FromResult<object>(serie);
     }
 
     private async Task<object> ObtenerTopProductosAsync(DateTime inicio, DateTime fin, int top)
