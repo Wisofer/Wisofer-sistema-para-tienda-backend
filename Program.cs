@@ -93,6 +93,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IReporteService, ReporteService>();
 builder.Services.AddScoped<ICajaService, CajaService>();
 builder.Services.AddScoped<IStorageService, R2StorageService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<ExcelExportService>();
 
 builder.Services.AddHttpContextAccessor();

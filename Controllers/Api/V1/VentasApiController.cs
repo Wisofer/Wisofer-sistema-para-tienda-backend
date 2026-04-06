@@ -11,10 +11,12 @@ namespace SistemaDeTienda.Controllers.Api.V1;
 public class VentasApiController : BaseApiController
 {
     private readonly IVentaService _ventaService;
+    private readonly ITicketService _ticketService;
 
-    public VentasApiController(IVentaService ventaService)
+    public VentasApiController(IVentaService ventaService, ITicketService ticketService)
     {
         _ventaService = ventaService;
+        _ticketService = ticketService;
     }
 
     [HttpPost("procesar-pago")]
@@ -52,6 +54,21 @@ public class VentasApiController : BaseApiController
     public async Task<IActionResult> GestionarPago([FromBody] ProcesarPagoVentaRequest request)
     {
         return await ProcesarPago(request);
+    }
+
+    [HttpGet("{id:int}/ticket")]
+    [AllowAnonymous] // Permitir descarga sin auth o con control
+    public async Task<IActionResult> DescargarTicket(int id)
+    {
+        try
+        {
+            var pdfBytes = await _ticketService.GenerarTicketPdfAsync(id);
+            return File(pdfBytes, "application/pdf", $"Ticket_{id}.pdf");
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
     }
 }
 
