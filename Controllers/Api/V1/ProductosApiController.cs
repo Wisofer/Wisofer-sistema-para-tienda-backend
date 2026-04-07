@@ -235,25 +235,33 @@ public class ProductosApiController : BaseApiController
 
         if (!string.IsNullOrWhiteSpace(request.Codigo)) producto.Codigo = request.Codigo.Trim();
 
-        // Procesar Imagen nueva
+        // Imagen: archivo nuevo sustituye; sin archivo, EliminarImagen=true borra foto y referencia (multipart no indica "sin cambio" explícito).
         if (request.Imagen != null)
         {
             try
             {
-                // Eliminar imagen anterior si existe
                 if (!string.IsNullOrWhiteSpace(producto.ImagenUrl))
-                {
                     await _storageService.DeleteFileAsync(producto.ImagenUrl);
-                }
 
                 using var stream = request.Imagen.OpenReadStream();
                 producto.ImagenUrl = await _storageService.UploadFileAsync(stream, request.Imagen.FileName, request.Imagen.ContentType);
             }
             catch (Exception ex)
             {
-                // No detenemos la actualización del producto por error en imagen, pero avisamos.
-                // Sin embargo, para mayor robustez, aquí lanzamos fail si el usuario lo requiere.
                 return FailResponse($"Error al actualizar la imagen: {ex.Message}");
+            }
+        }
+        else if (request.EliminarImagen)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(producto.ImagenUrl))
+                    await _storageService.DeleteFileAsync(producto.ImagenUrl);
+                producto.ImagenUrl = null;
+            }
+            catch (Exception ex)
+            {
+                return FailResponse($"Error al eliminar la imagen: {ex.Message}");
             }
         }
 
@@ -304,6 +312,9 @@ public class ProductoUpsertRequest
 
     // Foto del Producto
     public IFormFile? Imagen { get; set; }
+
+    /// <summary>Solo en PUT: si es true y no se envía <see cref="Imagen"/>, elimina la imagen almacenada y deja la referencia en null.</summary>
+    public bool EliminarImagen { get; set; }
 
     // Campos para variante inicial
     public string? Talla { get; set; }

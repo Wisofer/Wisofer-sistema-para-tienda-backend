@@ -85,6 +85,12 @@ Los endpoints usan `[Authorize(Policy = "Admin")]` para operaciones administrati
 
 **Validaciones:** nombre obligatorio; código único; si no hay código se genera automáticamente.
 
+**Multipart `PUT` — imagen del producto**
+
+- Si no se envía parte `Imagen`, la foto existente **no se modifica** (comportamiento habitual).
+- Para **quitar** la imagen guardada sin subir otra: enviar `EliminarImagen` = `true` (string `"true"` o checkbox) **y** no incluir archivo en `Imagen`. El servidor elimina el fichero en almacenamiento (p. ej. R2) y deja `ImagenUrl` en null.
+- Si se envía `Imagen` (archivo nuevo), sustituye la anterior; en ese caso `EliminarImagen` se ignora en favor del archivo.
+
 ### 3.2 Catálogos (categorías y proveedores)
 
 **Base:** `/api/v1/catalogos`
