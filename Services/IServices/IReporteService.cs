@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using SistemaDeTienda.Utils;
+
 namespace SistemaDeTienda.Services.IServices;
 
 public interface IReporteService
@@ -88,7 +90,7 @@ public class VentaDetalleReporte
     public int Id { get; set; }
     public string Numero { get; set; } = string.Empty;
     public DateTime Fecha { get; set; }
-    public string Cliente { get; set; } = "Cliente General";
+    public string Cliente { get; set; } = VentaClienteLabels.SinIdentificar;
     public string? Usuario { get; set; }
     /// <summary>Total cobrado (neto tras descuento en pago, si aplica).</summary>
     public decimal Total { get; set; }

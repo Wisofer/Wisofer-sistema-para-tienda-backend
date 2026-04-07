@@ -3,6 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SistemaDeTienda.Data;
 using SistemaDeTienda.Services.IServices;
+using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,7 +37,7 @@ public class TicketService : ITicketService
 
         var pago = await _context.Pagos.FirstOrDefaultAsync(p => p.VentaId == ventaId);
         var nombreCajero = venta.Usuario?.NombreCompleto ?? "—";
-        var nombreCliente = venta.Cliente?.Nombre ?? "Consumidor Final";
+        var nombreCliente = venta.Cliente?.Nombre ?? VentaClienteLabels.SinIdentificar;
         var subtotalLineas = venta.DetalleVentas.Sum(d => d.Total);
         var metodo = (pago?.TipoPago ?? "EFECTIVO").ToUpperInvariant();
         var fechaPie = pago?.FechaPago ?? venta.Fecha;

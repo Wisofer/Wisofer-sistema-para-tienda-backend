@@ -1,7 +1,7 @@
 using SistemaDeTienda.Data;
+using SistemaDeTienda.Utils;
 using SistemaDeTienda.Models.Entities;
 using SistemaDeTienda.Services.IServices;
-using SistemaDeTienda.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace SistemaDeTienda.Services;
@@ -73,7 +73,7 @@ public class ReporteService : IReporteService
                 Id = v.Id,
                 Numero = v.Numero,
                 Fecha = v.Fecha,
-                Cliente = v.Cliente?.Nombre ?? "Cliente General",
+                Cliente = v.Cliente?.Nombre ?? VentaClienteLabels.SinIdentificar,
                 Usuario = v.Usuario?.NombreUsuario,
                 SubtotalLineas = subLineas,
                 Total = netoPorVenta.GetValueOrDefault(v.Id, subLineas),
@@ -122,7 +122,7 @@ public class ReporteService : IReporteService
             Id = v.Id,
             Numero = v.Numero,
             Fecha = v.Fecha,
-            Cliente = v.Cliente?.Nombre ?? "Cliente General",
+            Cliente = v.Cliente?.Nombre ?? VentaClienteLabels.SinIdentificar,
             Cajero = v.Usuario?.NombreCompleto ?? v.Usuario?.NombreUsuario,
             Estado = v.Estado,
             SubtotalLineas = subLineas,
