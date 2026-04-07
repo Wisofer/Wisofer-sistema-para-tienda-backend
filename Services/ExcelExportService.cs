@@ -1,5 +1,6 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using SistemaDeTienda.Services.IServices;
 using System.Drawing;
 using System.Reflection;
 
@@ -102,6 +103,46 @@ public class ExcelExportService
 
         if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 2, 3 });
         ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Ventas por Categoría");
+        return package.GetAsByteArray();
+    }
+
+    /// <summary>Hoja resumen por categoría + hoja detalle por producto (mismo período).</summary>
+    public byte[] ExportarVentasPorCategoriaConDesglose(IReadOnlyList<VentaPorCategoriaConDesgloseReporte> categorias)
+    {
+        using var package = new ExcelPackage();
+        string[] headersResumen = { "Categoría", "Cantidad vendida", "Total ventas (C$)" };
+        var wsResumen = PrepareSheet(package, "Por categoría", headersResumen, HeaderIndigo);
+        int row = 2;
+        foreach (var c in categorias)
+        {
+            wsResumen.Cells[row, 1].Value = c.Categoria;
+            wsResumen.Cells[row, 2].Value = c.Cantidad;
+            SetCellMoney(wsResumen, row, 3, c.Monto);
+            row++;
+        }
+
+        if (row > 2) AddTotalRow(wsResumen, 2, row - 1, new[] { 2, 3 });
+        ApplyExpertStyles(wsResumen, wsResumen.Dimension!.End.Row, headersResumen.Length, "Ventas por categoría (resumen)");
+
+        string[] headersDetalle = { "Categoría", "Producto Id", "Código", "Nombre", "Cantidad", "Monto (C$)" };
+        var wsDet = PrepareSheet(package, "Por producto", headersDetalle, HeaderBlue);
+        row = 2;
+        foreach (var c in categorias)
+        {
+            foreach (var p in c.Productos)
+            {
+                wsDet.Cells[row, 1].Value = c.Categoria;
+                wsDet.Cells[row, 2].Value = p.ProductoId;
+                wsDet.Cells[row, 3].Value = p.CodigoProducto;
+                wsDet.Cells[row, 4].Value = p.NombreProducto;
+                wsDet.Cells[row, 5].Value = p.Cantidad;
+                SetCellMoney(wsDet, row, 6, p.Monto);
+                row++;
+            }
+        }
+
+        if (row > 2) AddTotalRow(wsDet, 2, row - 1, new[] { 5, 6 });
+        ApplyExpertStyles(wsDet, wsDet.Dimension!.End.Row, headersDetalle.Length, "Ventas por categoría — producto");
         return package.GetAsByteArray();
     }
 

@@ -148,6 +148,59 @@ public class ReporteService : IReporteService
             .OrderByDescending(v => v.Monto).ToList();
     }
 
+    public async Task<List<VentaPorCategoriaConDesgloseReporte>> ObtenerVentasPorCategoriaConDesgloseAsync(DateTime? desde, DateTime? hasta)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
+
+        var filas = await _context.DetalleVentas.AsNoTracking()
+            .Include(dv => dv.Venta)
+            .Include(dv => dv.Producto).ThenInclude(p => p.CategoriaProducto)
+            .Where(dv => (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) &&
+                         dv.Venta.Fecha >= fDesde && dv.Venta.Fecha <= fHasta)
+            .Select(dv => new
+            {
+                Categoria = dv.Producto.CategoriaProducto != null ? dv.Producto.CategoriaProducto.Nombre : "Sin categoría",
+                dv.ProductoId,
+                Codigo = dv.Producto.Codigo,
+                Nombre = dv.Producto.Nombre,
+                Monto = dv.Total,
+                Cantidad = dv.Cantidad
+            })
+            .ToListAsync();
+
+        return filas
+            .GroupBy(x => x.Categoria)
+            .Select(cat =>
+            {
+                var productos = cat
+                    .GroupBy(x => x.ProductoId)
+                    .Select(g =>
+                    {
+                        var first = g.First();
+                        return new VentaPorCategoriaProductoDesglose
+                        {
+                            ProductoId = g.Key,
+                            CodigoProducto = first.Codigo ?? "",
+                            NombreProducto = first.Nombre ?? "",
+                            Cantidad = g.Sum(x => x.Cantidad),
+                            Monto = Math.Round(g.Sum(x => x.Monto), 2, MidpointRounding.AwayFromZero)
+                        };
+                    })
+                    .OrderByDescending(p => p.Monto)
+                    .ToList();
+
+                return new VentaPorCategoriaConDesgloseReporte
+                {
+                    Categoria = cat.Key,
+                    Monto = Math.Round(cat.Sum(x => x.Monto), 2, MidpointRounding.AwayFromZero),
+                    Cantidad = cat.Sum(x => x.Cantidad),
+                    Productos = productos
+                };
+            })
+            .OrderByDescending(c => c.Monto)
+            .ToList();
+    }
+
     public async Task<List<VentaPorVendedorReporte>> ObtenerVentasPorVendedorAsync(DateTime? desde, DateTime? hasta)
     {
         var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
@@ -223,6 +276,11 @@ public class ReporteService : IReporteService
     public byte[] GenerarExcelCategorias(DateTime desde, DateTime hasta, List<VentaPorCategoriaReporte> items)
     {
         return _excelExportService.ExportarVentasPorCategoria(items.Select(x => new { Categoria = x.Categoria, Cantidad = x.Cantidad, Monto = x.Monto }).ToList());
+    }
+
+    public byte[] GenerarExcelCategoriasConDesglose(DateTime desde, DateTime hasta, List<VentaPorCategoriaConDesgloseReporte> items)
+    {
+        return _excelExportService.ExportarVentasPorCategoriaConDesglose(items);
     }
 
     public byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items)

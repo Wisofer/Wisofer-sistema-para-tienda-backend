@@ -196,8 +196,35 @@ La lógica de negocio exige **caja abierta** para registrar ventas y cobros (ver
 ]
 ```
 | `GET` | `/api/v1/reportes/ventas-por-vendedor` | Query: `desde`, `hasta`. Agrupa por usuario que registró la venta (POS). `exportar=true` → Excel. |
-| `GET` | `/api/v1/reportes/ventas-por-categoria` | `exportar=true` → Excel. |
+| `GET` | `/api/v1/reportes/ventas-por-categoria` | Totales por categoría (ítems y monto). `exportar=true` → Excel. |
+| `GET` | `/api/v1/reportes/ventas-por-categoria/desglose` | Igual rango `desde`/`hasta`; cada categoría incluye `productos[]` con desglose por producto. `exportar=true` → Excel (hoja resumen + hoja por producto). |
 | `GET` | `/api/v1/reportes/productos-top` | Parámetro `top`; `exportar=true` → Excel. |
+
+**Ejemplo `data.items` en `ventas-por-categoria/desglose` (fragmento):**
+
+```json
+{
+  "desde": "2026-03-01T00:00:00",
+  "hasta": "2026-03-31T23:59:59.9999999",
+  "totalCategorias": 2,
+  "items": [
+    {
+      "categoria": "Ropa",
+      "monto": 1500.5,
+      "cantidad": 12,
+      "productos": [
+        {
+          "productoId": 3,
+          "codigoProducto": "RO-0001",
+          "productoNombre": "Camisa",
+          "cantidad": 5,
+          "monto": 600.0
+        }
+      ]
+    }
+  ]
+}
+```
 
 ---
 

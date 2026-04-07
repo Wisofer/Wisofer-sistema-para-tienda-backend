@@ -25,6 +25,11 @@ public interface IReporteService
     Task<List<VentaPorCategoriaReporte>> ObtenerVentasPorCategoriaAsync(DateTime? desde, DateTime? hasta);
 
     /// <summary>
+    /// Ventas por categoría con desglose por producto (mismo rango que <see cref="ObtenerVentasPorCategoriaAsync"/>).
+    /// </summary>
+    Task<List<VentaPorCategoriaConDesgloseReporte>> ObtenerVentasPorCategoriaConDesgloseAsync(DateTime? desde, DateTime? hasta);
+
+    /// <summary>
     /// Obtiene el top de productos más vendidos.
     /// </summary>
     Task<List<ProductoTopReporte>> ObtenerProductosTopAsync(DateTime? desde, DateTime? hasta, int top);
@@ -43,6 +48,11 @@ public interface IReporteService
     /// Genera el archivo Excel para el reporte de ventas por categoría.
     /// </summary>
     byte[] GenerarExcelCategorias(DateTime desde, DateTime hasta, List<VentaPorCategoriaReporte> items);
+
+    /// <summary>
+    /// Excel: resumen por categoría + hoja de detalle por producto.
+    /// </summary>
+    byte[] GenerarExcelCategoriasConDesglose(DateTime desde, DateTime hasta, List<VentaPorCategoriaConDesgloseReporte> items);
 
     /// <summary>
     /// Genera el archivo Excel para el reporte de productos top.
@@ -128,6 +138,29 @@ public class VentaPorCategoriaReporte
     public string Categoria { get; set; } = string.Empty;
     public decimal Monto { get; set; }
     public int Cantidad { get; set; }
+}
+
+/// <summary>Una categoría con totales y lista de productos vendidos en el período.</summary>
+public class VentaPorCategoriaConDesgloseReporte
+{
+    public string Categoria { get; set; } = string.Empty;
+    public decimal Monto { get; set; }
+    public int Cantidad { get; set; }
+    public List<VentaPorCategoriaProductoDesglose> Productos { get; set; } = new();
+}
+
+public class VentaPorCategoriaProductoDesglose
+{
+    public int ProductoId { get; set; }
+
+    [JsonPropertyName("codigoProducto")]
+    public string CodigoProducto { get; set; } = "";
+
+    [JsonPropertyName("productoNombre")]
+    public string NombreProducto { get; set; } = "";
+
+    public int Cantidad { get; set; }
+    public decimal Monto { get; set; }
 }
 
 public class ProductoTopReporte
