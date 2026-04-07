@@ -17,13 +17,13 @@ public class ReportesApiController : BaseApiController
     }
 
     [HttpGet("resumen-ventas")]
-    public async Task<IActionResult> ResumenVentas([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] bool exportar = false)
+    public async Task<IActionResult> ResumenVentas([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] bool exportar = false, [FromQuery] string? filtroVentas = "activas")
     {
         try
         {
             if (exportar)
             {
-                var detalle = await _reporteService.ObtenerDetalleVentasAsync(desde, hasta);
+                var detalle = await _reporteService.ObtenerDetalleVentasAsync(desde, hasta, filtroVentas);
                 var fDesde = desde ?? DateTime.Today;
                 var fHasta = hasta ?? DateTime.Today;
                 var bytes = _reporteService.GenerarExcelVentas(fDesde, fHasta, detalle);
@@ -40,15 +40,16 @@ public class ReportesApiController : BaseApiController
     }
 
     [HttpGet("resumen-ventas/detalle")]
-    public async Task<IActionResult> ResumenVentasDetalle([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta)
+    public async Task<IActionResult> ResumenVentasDetalle([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] string? filtroVentas = "activas")
     {
         try
         {
-            var detalle = await _reporteService.ObtenerDetalleVentasAsync(desde, hasta);
+            var detalle = await _reporteService.ObtenerDetalleVentasAsync(desde, hasta, filtroVentas);
             return OkResponse(new
             {
                 desde = desde ?? DateTime.Today,
                 hasta = hasta ?? DateTime.Today,
+                filtroVentas = filtroVentas ?? "activas",
                 total = detalle.Count,
                 items = detalle
             });
@@ -59,7 +60,7 @@ public class ReportesApiController : BaseApiController
         }
     }
 
-    /// <summary>Una venta (ticket) con todas las líneas de producto. Solo ventas cobradas.</summary>
+    /// <summary>Una venta (ticket) con todas las líneas. Incluye cobradas y anuladas.</summary>
     [HttpGet("ventas/{id:int}/ticket-detalle")]
     public async Task<IActionResult> TicketDetalle(int id)
     {
@@ -67,7 +68,7 @@ public class ReportesApiController : BaseApiController
         {
             var ticket = await _reporteService.ObtenerTicketCompletoPorVentaIdAsync(id);
             if (ticket == null)
-                return FailResponse("Venta no encontrada o aún no cobrada.", StatusCodes.Status404NotFound);
+                return FailResponse("Venta no encontrada o estado no disponible para este reporte.", StatusCodes.Status404NotFound);
             return OkResponse(ticket);
         }
         catch (Exception ex)

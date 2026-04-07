@@ -12,7 +12,8 @@ public interface IReporteService
     /// <summary>
     /// Obtiene el detalle de ventas en un rango de fechas (una fila por ticket).
     /// </summary>
-    Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta);
+    /// <param name="filtroVentas"><c>activas</c> (solo cobradas), <c>anuladas</c>, <c>todas</c> (cobradas + anuladas).</param>
+    Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta, string? filtroVentas = "activas");
 
     /// <summary>
     /// Un ticket con todas sus líneas de producto (venta pagada).
@@ -96,6 +97,9 @@ public class VentaDetalleReporte
     /// <summary>Cantidad de líneas de detalle en el ticket.</summary>
     public int CantidadLineas { get; set; }
     public string Estado { get; set; } = string.Empty;
+
+    /// <summary>Última modificación del ticket (útil para auditoría de anulaciones).</summary>
+    public DateTime FechaUltimaActualizacion { get; set; }
 }
 
 /// <summary>Detalle completo de un ticket para reportes (una venta, N líneas).</summary>

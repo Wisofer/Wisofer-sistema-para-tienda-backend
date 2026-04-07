@@ -51,10 +51,10 @@ public class ReporteService : IReporteService
         };
     }
 
-    public async Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta)
+    public async Task<List<VentaDetalleReporte>> ObtenerDetalleVentasAsync(DateTime? desde, DateTime? hasta, string? filtroVentas = "activas")
     {
         var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today);
-        var ventas = await QueryVentasPagadas(fDesde, fHasta)
+        var ventas = await QueryVentasDetalleReporte(fDesde, fHasta, filtroVentas)
             .Include(v => v.DetalleVentas)
             .Include(v => v.Cliente)
             .Include(v => v.Usuario)
@@ -78,7 +78,8 @@ public class ReporteService : IReporteService
                 SubtotalLineas = subLineas,
                 Total = netoPorVenta.GetValueOrDefault(v.Id, subLineas),
                 CantidadLineas = activas.Count,
-                Estado = v.Estado
+                Estado = v.Estado,
+                FechaUltimaActualizacion = v.FechaActualizacion
             };
         }).ToList();
     }
@@ -93,7 +94,7 @@ public class ReporteService : IReporteService
             .FirstOrDefaultAsync(x => x.Id == ventaId);
 
         if (v == null) return null;
-        if (v.Estado != SD.EstadoVentaPagado && v.Estado != SD.EstadoVentaCompletada)
+        if (v.Estado != SD.EstadoVentaPagado && v.Estado != SD.EstadoVentaCompletada && v.Estado != SD.EstadoVentaAnulada)
             return null;
 
         var netoMap = await GetNetoPorVentaAsync(new[] { v });
@@ -276,6 +277,7 @@ public class ReporteService : IReporteService
         {
             numero = v.Numero,
             fecha = v.Fecha,
+            estado = v.Estado,
             metodoPago = "Venta POS",
             lineas = v.CantidadLineas,
             subtotalLineas = v.SubtotalLineas,
@@ -325,6 +327,22 @@ public class ReporteService : IReporteService
 
     private IQueryable<Venta> QueryVentasPagadas(DateTime fDesde, DateTime fHasta) =>
         _context.Ventas.AsNoTracking().Where(f => (f.Estado == SD.EstadoVentaPagado || f.Estado == SD.EstadoVentaCompletada) && f.Fecha >= fDesde && f.Fecha <= fHasta);
+
+    /// <summary>Detalle listado: activas = solo cobradas; anuladas = solo anuladas; todas = cobradas + anuladas.</summary>
+    private IQueryable<Venta> QueryVentasDetalleReporte(DateTime fDesde, DateTime fHasta, string? filtroVentas)
+    {
+        var q = _context.Ventas.AsNoTracking().Where(f => f.Fecha >= fDesde && f.Fecha <= fHasta);
+        var s = (filtroVentas ?? "activas").Trim().ToLowerInvariant();
+        return s switch
+        {
+            "anuladas" => q.Where(v => v.Estado == SD.EstadoVentaAnulada),
+            "todas" => q.Where(v =>
+                v.Estado == SD.EstadoVentaPagado ||
+                v.Estado == SD.EstadoVentaCompletada ||
+                v.Estado == SD.EstadoVentaAnulada),
+            _ => q.Where(v => v.Estado == SD.EstadoVentaPagado || v.Estado == SD.EstadoVentaCompletada),
+        };
+    }
 
     private async Task<Dictionary<int, decimal>> GetNetoPorVentaAsync(IEnumerable<Venta> ventas)
     {

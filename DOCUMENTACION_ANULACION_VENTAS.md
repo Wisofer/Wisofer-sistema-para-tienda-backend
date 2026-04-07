@@ -141,7 +141,16 @@ Los totales de cierre de caja y los netos por venta (`CobroVentasHelper`) suman 
   - `detalleId` — identificador para `cancelar-parcial`
   - `anulado` — si la línea ya fue anulada en una devolución parcial
 
-Ventas en estado **`Anulada`** no se tratan como ventas cobradas activas en los filtros habituales (`Pagado` / `Completada`).
+**Listado de tickets (reporte de ventas):** query opcional **`filtroVentas`** en:
+
+- `GET /api/v1/reportes/resumen-ventas/detalle?desde=&hasta=&filtroVentas=`
+- `GET /api/v1/reportes/resumen-ventas?exportar=true&...` (Excel de detalle usa el mismo filtro)
+
+Valores: **`activas`** (solo cobradas: `Pagado` / `Completada`; valor por defecto), **`anuladas`** (solo `Estado == Anulada`), **`todas`** (cobradas + anuladas). Cada ítem del detalle incluye **`estado`**, **`fechaUltimaActualizacion`** y totales netos coherentes con pagos.
+
+El KPI de **`GET /api/v1/reportes/resumen-ventas`** (sin `exportar`) sigue siendo el resumen agregado habitual; el filtro aplica al **detalle** y a la **exportación Excel** cuando se usa `exportar=true`.
+
+**Ticket detalle:** `GET /api/v1/reportes/ventas/{id}/ticket-detalle` está disponible también para ventas **anuladas** (consulta administrativa del ticket).
 
 ---
 
@@ -151,6 +160,7 @@ Ventas en estado **`Anulada`** no se tratan como ventas cobradas activas en los 
 2. Devolución parcial: desde el detalle del ticket, enviar los **`detalleId`** de las filas seleccionadas (no confundir con `productoId`).
 3. Tras éxito, refrescar listados de ventas y, si aplica, detalle del ticket.
 4. Mostrar mensajes de error del cuerpo de respuesta (`ApiResponse`) tal cual los devuelve el backend.
+5. En reportes de ventas: enviar **`filtroVentas`** al cargar detalle y al exportar Excel; UI con selector (p. ej. solo cobradas / solo anuladas / todas) y columnas **estado** + **fecha de última actualización** si el backend las envía.
 
 ---
 
