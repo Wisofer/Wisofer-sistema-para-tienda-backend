@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
+[Authorize(Policy = "Pos")]
 [Route("api/v1/productos")]
 public class ProductosApiController : BaseApiController
 {

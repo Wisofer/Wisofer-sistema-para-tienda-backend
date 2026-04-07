@@ -87,6 +87,18 @@ Hace **rotación**:
 
 - `GET /auth/me`
 
+### 2.6 Roles y políticas (claim `Rol` en el JWT)
+
+Valores: **`Administrador`**, **`Cajero`**, **`Normal`**.
+
+| Política | Roles permitidos | Uso típico |
+|----------|------------------|------------|
+| **Admin** | Solo Administrador | Dashboard, reportes, usuarios, inventario, anulaciones, configuración completa, altas/edición de productos y catálogos (escritura). |
+| **Cajero** | Administrador o Cajero | **Caja** (estado, apertura, cierre, historial), **GET** de `/catalogos/*` (categorías y proveedores). |
+| **Pos** | Los tres roles | POS (`/pos/ventas`), ventas (pago, ticket), clientes, **GET** de productos; **`GET /configuraciones/tipo-cambio`** (tipo de cambio en cobro). |
+
+El rol **Normal** no accede a dashboard, caja ni catálogos de maestros por API; puede operar ventas y consultar productos/clientes según lo anterior.
+
 ---
 
 ## 3) Paginación (mesas/productos/pedidos/usuarios)
@@ -359,7 +371,7 @@ Estado de caja del día (abierta/cerrada + datos de cierre).
 ### `GET /caja/ordenes-pendientes`
 Pedidos no pagados para mostrar en caja.
 
-### `POST /caja/apertura` (Admin)
+### `POST /caja/apertura` (Administrador o Cajero)
 Abre caja del día.
 
 Body:
@@ -368,12 +380,12 @@ Body:
 { "montoInicial": 1000 }
 ```
 
-### `GET /caja/cierre/preview` (Admin)
+### `GET /caja/cierre/preview` (Administrador o Cajero)
 Obtiene resumen de totales del día para validar cierre de caja.
 
 En `totales`, `totalGeneral` es la **suma de `Pagos.Monto`** del día (neto cobrado en C$ equivalente), alineada con el desglose por método de pago y con el criterio de ingresos. No usa la suma de `Factura.Monto` de pedidos pagados (que sería consumo bruto y no coincidiría con descuentos en cobro).
 
-### `POST /caja/cierre` (Admin)
+### `POST /caja/cierre` (Administrador o Cajero)
 Cierra caja del día.
 
 Body:
@@ -385,7 +397,7 @@ Body:
 }
 ```
 
-### `GET /caja/historial` (Admin)
+### `GET /caja/historial` (Administrador o Cajero)
 Historial de cierres (paginado).
 
 Query:

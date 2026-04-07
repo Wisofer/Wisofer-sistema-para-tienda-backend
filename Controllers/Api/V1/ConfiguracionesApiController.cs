@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
 [Route("api/v1/configuraciones")]
 public class ConfiguracionesApiController : BaseApiController
 {
@@ -17,6 +16,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpGet]
+    [Authorize(Policy = "Admin")]
     public IActionResult GetAll()
     {
         var items = _configuracionService.ObtenerTodas();
@@ -31,6 +31,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpGet("tipo-cambio")]
+    [Authorize(Policy = "Pos")]
     public IActionResult GetTipoCambio()
     {
         var tipoCambio = _configuracionService.ObtenerValorDecimal("TipoCambioDolar");
@@ -70,6 +71,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpGet("plantillas-whatsapp")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> GetPlantillasWhatsApp([FromQuery] bool? activas)
     {
         var items = await _configuracionService.ObtenerPlantillasWhatsAppAsync(activas);
@@ -86,6 +88,7 @@ public class ConfiguracionesApiController : BaseApiController
     }
 
     [HttpGet("plantillas-whatsapp/{id:int}")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> GetPlantillaWhatsAppById(int id)
     {
         var item = await _configuracionService.ObtenerPlantillaWhatsAppPorIdAsync(id);

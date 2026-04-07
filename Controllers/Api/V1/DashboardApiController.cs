@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
+[Authorize(Policy = "Admin")]
 [Route("api/v1/dashboard")]
 public class DashboardApiController : BaseApiController
 {

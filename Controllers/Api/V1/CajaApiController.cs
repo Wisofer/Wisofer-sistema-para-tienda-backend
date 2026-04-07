@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
+/// <summary>Caja: solo Administrador y Cajero. El rol Normal no abre/cierra ni ve historial.</summary>
+[Authorize(Policy = "Cajero")]
 [Route("api/v1/caja")]
 public class CajaApiController : BaseApiController
 {
@@ -45,7 +46,6 @@ public class CajaApiController : BaseApiController
     }
 
     [HttpPost("apertura")]
-    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Apertura([FromBody] AperturaCajaRequest request)
     {
         var userId = SecurityHelper.GetUserId(User);
@@ -68,7 +68,6 @@ public class CajaApiController : BaseApiController
     }
 
     [HttpGet("cierre/preview")]
-    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> PreviewCierre()
     {
         try
@@ -93,7 +92,6 @@ public class CajaApiController : BaseApiController
     }
 
     [HttpPost("cierre")]
-    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> CerrarCaja([FromBody] CierreCajaRequest request)
     {
         try
@@ -108,7 +106,6 @@ public class CajaApiController : BaseApiController
     }
 
     [HttpGet("historial")]
-    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> Historial([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         try

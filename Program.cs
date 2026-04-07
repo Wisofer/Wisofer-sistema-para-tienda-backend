@@ -101,8 +101,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy => policy.RequireClaim("Rol", "Administrador"));
-    options.AddPolicy("Cajero", policy => policy.RequireClaim("Rol", "Cajero", "Administrador"));
+    // Solo Administrador (reportes, usuarios, inventario, anulaciones, etc.)
+    options.AddPolicy("Admin", policy => policy.RequireClaim("Rol", SD.RolAdministrador));
+    // Administrador o Cajero: caja (apertura/cierre), catálogos de maestros (no Normal)
+    options.AddPolicy("Cajero", policy => policy.RequireClaim("Rol", SD.RolCajero, SD.RolAdministrador));
+    // POS y ventas: los tres roles (mostrador / venta sin gestión de maestros de caja en API)
+    options.AddPolicy("Pos", policy => policy.RequireClaim("Rol", SD.RolAdministrador, SD.RolCajero, SD.RolNormal));
 });
 
 // Registrar servicios

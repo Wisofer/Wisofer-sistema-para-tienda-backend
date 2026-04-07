@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
+[Authorize(Policy = "Pos")]
 [Route("api/v1/pos")]
 public class PosApiController : BaseApiController
 {

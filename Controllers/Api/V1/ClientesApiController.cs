@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace SistemaDeTienda.Controllers.Api.V1;
 
 [Route("api/v1/clientes")]
-[Authorize]
+[Authorize(Policy = "Pos")]
 public class ClientesApiController : BaseApiController
 {
     private readonly IClienteService _clienteService;

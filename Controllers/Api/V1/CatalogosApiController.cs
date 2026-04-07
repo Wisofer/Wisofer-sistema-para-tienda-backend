@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemaDeTienda.Controllers.Api.V1;
 
-[Authorize]
+/// <summary>Catálogos de categorías y proveedores: Administrador y Cajero. Normal usa listados de productos sin este endpoint.</summary>
+[Authorize(Policy = "Cajero")]
 [Route("api/v1/catalogos")]
 public class CatalogosApiController : BaseApiController
 {
