@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using System.Linq;
 
 // Configurar Npgsql para manejar DateTime correctamente con PostgreSQL
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -47,8 +48,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-// Configurar CORS
-var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+// CORS: en producción a veces solo se despliegan dominios del SPA; los devs usan Vite en localhost contra la API remota.
+var configuredOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var localhostDevOrigins = new[] { "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173" };
+var mergeLocalhost = builder.Configuration.GetValue("Cors:MergeLocalhostDevOrigins", true);
+var corsOrigins = mergeLocalhost
+    ? configuredOrigins.Concat(localhostDevOrigins).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+    : (configuredOrigins.Length > 0 ? configuredOrigins : localhostDevOrigins);
 
 builder.Services.AddCors(options =>
 {

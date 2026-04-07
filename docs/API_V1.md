@@ -631,10 +631,11 @@ Devuelve en `data`:
 
 ## 5) CORS y entorno local
 
-Para frontend local (`http://localhost:5173`) CORS ya está habilitado en backend.
+Orígenes permitidos: `Cors:AllowedOrigins` en `appsettings` o variables de entorno.
 
-Si despliegas en dominio distinto, agrega el origen en:
-- `appsettings.json` -> `Cors:AllowedOrigins`
+Por defecto **`Cors:MergeLocalhostDevOrigins`** es `true`: se unen siempre `http://localhost:5173`, `127.0.0.1:5173` y los puertos `4173` (preview Vite) a la lista, para poder desarrollar en local contra una API desplegada sin olvidar orígenes en el servidor.
+
+Si en producción quieres **no** incluir localhost automáticamente, pon `MergeLocalhostDevOrigins` en `false` y declara solo los orígenes que necesites en `AllowedOrigins`.
 
 ---
 
