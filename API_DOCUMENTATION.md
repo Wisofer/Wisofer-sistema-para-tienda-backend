@@ -195,6 +195,7 @@ La lógica de negocio exige **caja abierta** para registrar ventas y cobros (ver
   }
 ]
 ```
+| `GET` | `/api/v1/reportes/ventas-por-vendedor` | Query: `desde`, `hasta`. Agrupa por usuario que registró la venta (POS). `exportar=true` → Excel. |
 | `GET` | `/api/v1/reportes/ventas-por-categoria` | `exportar=true` → Excel. |
 | `GET` | `/api/v1/reportes/productos-top` | Parámetro `top`; `exportar=true` → Excel. |
 

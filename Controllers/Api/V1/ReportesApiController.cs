@@ -76,6 +76,36 @@ public class ReportesApiController : BaseApiController
         }
     }
 
+    /// <summary>Ventas cobradas agrupadas por usuario que registró el ticket (cajero / vendedor POS).</summary>
+    [HttpGet("ventas-por-vendedor")]
+    public async Task<IActionResult> VentasPorVendedor([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] bool exportar = false)
+    {
+        try
+        {
+            var items = await _reporteService.ObtenerVentasPorVendedorAsync(desde, hasta);
+
+            if (exportar)
+            {
+                var fDesde = desde ?? DateTime.Today.AddDays(-30);
+                var fHasta = hasta ?? DateTime.Today;
+                var bytes = _reporteService.GenerarExcelVentasPorVendedor(fDesde, fHasta, items);
+                return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"ventas_por_vendedor_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+            }
+
+            return OkResponse(new
+            {
+                desde = desde ?? DateTime.Today.AddDays(-30),
+                hasta = hasta ?? DateTime.Today,
+                total = items.Count,
+                items
+            });
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
     [HttpGet("ventas-por-categoria")]
     public async Task<IActionResult> VentasPorCategoria([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta, [FromQuery] bool exportar = false)
     {

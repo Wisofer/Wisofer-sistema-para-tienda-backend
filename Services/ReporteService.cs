@@ -148,6 +148,42 @@ public class ReporteService : IReporteService
             .OrderByDescending(v => v.Monto).ToList();
     }
 
+    public async Task<List<VentaPorVendedorReporte>> ObtenerVentasPorVendedorAsync(DateTime? desde, DateTime? hasta)
+    {
+        var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
+        var ventas = await QueryVentasPagadas(fDesde, fHasta)
+            .Include(v => v.Usuario)
+            .ToListAsync();
+
+        var netoPorVenta = await GetNetoPorVentaAsync(ventas);
+
+        return ventas
+            .GroupBy(v => v.UsuarioId)
+            .Select(g =>
+            {
+                var u = g.First().Usuario;
+                var tickets = g.Count();
+                var totalNeto = Math.Round(
+                    g.Sum(v => netoPorVenta.GetValueOrDefault(v.Id, v.Total)),
+                    2,
+                    MidpointRounding.AwayFromZero);
+                return new VentaPorVendedorReporte
+                {
+                    UsuarioId = g.Key,
+                    NombreCompleto = u?.NombreCompleto ?? "",
+                    NombreUsuario = u?.NombreUsuario ?? "",
+                    Rol = u?.Rol,
+                    CantidadTickets = tickets,
+                    TotalNeto = totalNeto,
+                    PromedioTicket = tickets > 0
+                        ? Math.Round(totalNeto / tickets, 2, MidpointRounding.AwayFromZero)
+                        : 0
+                };
+            })
+            .OrderByDescending(x => x.TotalNeto)
+            .ToList();
+    }
+
     public async Task<List<ProductoTopReporte>> ObtenerProductosTopAsync(DateTime? desde, DateTime? hasta, int top)
     {
         var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
@@ -192,6 +228,20 @@ public class ReporteService : IReporteService
     public byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items)
     {
         return _excelExportService.ExportarTopProductos(items.Select(x => new { Producto = x.Producto, Cantidad = x.Cantidad, Venta = x.Venta }).ToList());
+    }
+
+    public byte[] GenerarExcelVentasPorVendedor(DateTime desde, DateTime hasta, List<VentaPorVendedorReporte> items)
+    {
+        return _excelExportService.ExportarVentasPorVendedor(items.Select(x => new
+        {
+            usuarioId = x.UsuarioId,
+            nombreCompleto = x.NombreCompleto,
+            nombreUsuario = x.NombreUsuario,
+            rol = x.Rol,
+            cantidadTickets = x.CantidadTickets,
+            totalNeto = x.TotalNeto,
+            promedioTicket = x.PromedioTicket
+        }));
     }
 
     #region Helpers Privados

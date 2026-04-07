@@ -154,6 +154,38 @@ public class ExcelExportService
         return package.GetAsByteArray();
     }
 
+    public byte[] ExportarVentasPorVendedor(IEnumerable<dynamic> items)
+    {
+        using var package = new ExcelPackage();
+        string[] headers = { "Usuario Id", "Nombre", "Usuario", "Rol", "Tickets", "Total neto (C$)", "Promedio ticket (C$)" };
+        var worksheet = PrepareSheet(package, "Ventas por vendedor", headers, HeaderIndigo);
+
+        int row = 2;
+        foreach (var x in items)
+        {
+            worksheet.Cells[row, 1].Value = x.usuarioId ?? 0;
+            worksheet.Cells[row, 2].Value = x.nombreCompleto ?? "";
+            worksheet.Cells[row, 3].Value = x.nombreUsuario ?? "";
+            worksheet.Cells[row, 4].Value = x.rol ?? "";
+            worksheet.Cells[row, 5].Value = x.cantidadTickets ?? 0;
+            SetCellMoney(worksheet, row, 6, x.totalNeto ?? 0m);
+            SetCellMoney(worksheet, row, 7, x.promedioTicket ?? 0m);
+            row++;
+        }
+
+        if (row > 2)
+        {
+            var totalRow = row;
+            AddTotalRow(worksheet, 2, row - 1, new[] { 5, 6 });
+            var totalTickets = Convert.ToDecimal(worksheet.Cells[totalRow, 5].Value ?? 0m);
+            var totalNeto = Convert.ToDecimal(worksheet.Cells[totalRow, 6].Value ?? 0m);
+            if (totalTickets > 0)
+                SetCellMoney(worksheet, totalRow, 7, totalNeto / totalTickets);
+        }
+        ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Ventas por vendedor / cajero");
+        return package.GetAsByteArray();
+    }
+
     public byte[] ExportarMovimientosInventario(IEnumerable<dynamic> movimientos)
     {
         using var package = new ExcelPackage();

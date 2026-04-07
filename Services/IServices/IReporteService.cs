@@ -30,6 +30,11 @@ public interface IReporteService
     Task<List<ProductoTopReporte>> ObtenerProductosTopAsync(DateTime? desde, DateTime? hasta, int top);
 
     /// <summary>
+    /// Ventas agrupadas por usuario que registró la venta (cajero / vendedor POS).
+    /// </summary>
+    Task<List<VentaPorVendedorReporte>> ObtenerVentasPorVendedorAsync(DateTime? desde, DateTime? hasta);
+
+    /// <summary>
     /// Genera el archivo Excel para el reporte de ventas.
     /// </summary>
     byte[] GenerarExcelVentas(DateTime desde, DateTime hasta, List<VentaDetalleReporte> ventas);
@@ -43,6 +48,11 @@ public interface IReporteService
     /// Genera el archivo Excel para el reporte de productos top.
     /// </summary>
     byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items);
+
+    /// <summary>
+    /// Genera el archivo Excel para ventas por vendedor/cajero.
+    /// </summary>
+    byte[] GenerarExcelVentasPorVendedor(DateTime desde, DateTime hasta, List<VentaPorVendedorReporte> items);
 }
 
 public class ResumenVentasResponse
@@ -126,4 +136,16 @@ public class ProductoTopReporte
     public string Producto { get; set; } = string.Empty;
     public int Cantidad { get; set; }
     public decimal Venta { get; set; }
+}
+
+/// <summary>Ventas cobradas agrupadas por el usuario que registró el ticket (POS).</summary>
+public class VentaPorVendedorReporte
+{
+    public int UsuarioId { get; set; }
+    public string NombreCompleto { get; set; } = "";
+    public string NombreUsuario { get; set; } = "";
+    public string? Rol { get; set; }
+    public int CantidadTickets { get; set; }
+    public decimal TotalNeto { get; set; }
+    public decimal PromedioTicket { get; set; }
 }
