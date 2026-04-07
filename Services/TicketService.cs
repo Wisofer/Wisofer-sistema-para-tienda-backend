@@ -46,9 +46,6 @@ public class TicketService : ITicketService
         var tieneLogo = File.Exists(logoPath);
 
         const string fuenteTicket = Fonts.Courier;
-        const int anchoGuion = 38;
-
-        string Guiones() => new string('-', anchoGuion);
 
         var document = Document.Create(container =>
         {
@@ -71,7 +68,7 @@ public class TicketService : ITicketService
                         col.Item().AlignCenter().Text("SISTEMA DE TIENDA").Bold().FontSize(11).FontFamily(fuenteTicket);
                     }
 
-                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+                    col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Metadatos (etiqueta izq / valor der) ===
                     FilaEtiquetaValor(col, "RECIBO:", venta.Numero, fuenteTicket);
@@ -79,7 +76,7 @@ public class TicketService : ITicketService
                     FilaEtiquetaValor(col, "CAJERO:", nombreCajero, fuenteTicket);
                     FilaEtiquetaValor(col, "CLIENTE:", nombreCliente, fuenteTicket);
 
-                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+                    col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Cabecera tabla ===
                     col.Item().Row(r =>
@@ -106,7 +103,7 @@ public class TicketService : ITicketService
                         });
                     }
 
-                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+                    col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Subtotal / Total ===
                     col.Item().Row(r =>
@@ -123,7 +120,7 @@ public class TicketService : ITicketService
 
                     col.Item().PaddingTop(6).Text($"MÉTODO: {metodo}");
 
-                    col.Item().PaddingVertical(4).Text(Guiones()).FontSize(7);
+                    col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Pie ===
                     col.Item().AlignCenter().Text("¡Gracias por su preferencia!").Bold().FontSize(8);
