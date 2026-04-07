@@ -116,6 +116,9 @@ public class VentaTicketCompletoReporte
 
 public class VentaLineaReporte
 {
+    public int DetalleId { get; set; }
+    public bool Anulado { get; set; }
+
     public int ProductoId { get; set; }
 
     [JsonPropertyName("codigoProducto")]

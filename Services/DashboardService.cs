@@ -123,7 +123,8 @@ public class DashboardService : IDashboardService
             .AsNoTracking()
             .Include(i => i.Venta)
             .Include(i => i.Producto)
-            .Where(i => (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
+            .Where(i => !i.Anulado &&
+                        (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
                         i.Venta.Fecha >= inicio && i.Venta.Fecha <= fin)
             .GroupBy(i => new { i.ProductoId, Nombre = i.Producto != null ? i.Producto.Nombre : "Producto Eliminado" })
             .Select(g => new
@@ -144,7 +145,8 @@ public class DashboardService : IDashboardService
             .AsNoTracking()
             .Include(dv => dv.Venta)
             .Include(dv => dv.Producto).ThenInclude(p => p.CategoriaProducto!)
-            .Where(dv => (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) &&
+            .Where(dv => !dv.Anulado &&
+                         (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) &&
                          dv.Venta.Fecha >= inicio && dv.Venta.Fecha <= fin)
                          .ToListAsync();
 

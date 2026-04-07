@@ -12,6 +12,8 @@ public interface IInventarioService
     PagedResult<MovimientoInventario> ObtenerMovimientosPaginado(DateTime? desde, DateTime? hasta, int? productoId, string? tipo, int page, int pageSize);
 
     MovimientoInventario RegistrarEntrada(int productoId, int? varianteId, int cantidad, decimal costoUnitario, int? proveedorId, string? numeroReferencia, string? observaciones, int usuarioId);
+    /// <summary>Reingresa mercadería por anulación/devolución de venta (subtipo Devolución, costo 0). Si el producto no controla stock, no hace nada.</summary>
+    void RestaurarStockPorDevolucionVenta(int productoId, int? varianteId, int cantidad, int usuarioId, string numeroReferencia, string? observaciones);
     MovimientoInventario RegistrarSalida(int productoId, int? varianteId, int cantidad, string subtipo, string? numeroReferencia, string? observaciones, int usuarioId);
     MovimientoInventario RegistrarAjuste(int productoId, int? varianteId, int stockFisicoReal, string? observaciones, int usuarioId);
 

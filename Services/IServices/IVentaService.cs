@@ -19,6 +19,12 @@ public interface IVentaService
     /// Genera el siguiente número de ticket disponible.
     /// </summary>
     string GenerarNumeroTicket();
+
+    /// <summary>Anula una venta cobrada: revierte stock, marca estado Anulada y registra reembolso en caja (Pago negativo). Requiere código de administrador.</summary>
+    Task AnularVentaAsync(int ventaId, AnularVentaRequest request, int usuarioId);
+
+    /// <summary>Anula líneas concretas (devolución parcial). Reembolso proporcional y líneas marcadas Anulado.</summary>
+    Task AnularVentaParcialAsync(int ventaId, AnularVentaParcialRequest request, int usuarioId);
 }
 
 public class PosCrearVentaRequest
@@ -46,4 +52,17 @@ public class ProcesarPagoVentaRequest
     public string? Observaciones { get; set; }
     public decimal? DescuentoMonto { get; set; }
     public string? DescuentoMotivo { get; set; }
+}
+
+public class AnularVentaRequest
+{
+    public string Codigo { get; set; } = "";
+    public string? Motivo { get; set; }
+}
+
+public class AnularVentaParcialRequest
+{
+    public string Codigo { get; set; } = "";
+    public List<int> DetalleIds { get; set; } = new();
+    public string? Motivo { get; set; }
 }

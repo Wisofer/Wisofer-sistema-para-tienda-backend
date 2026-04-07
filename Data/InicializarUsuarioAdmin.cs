@@ -43,6 +43,20 @@ public static class InicializarUsuarioAdmin
                 logger.LogInformation("Configuración Inicial creada: TipoCambioDolar");
             }
 
+            if (!context.Configuraciones.Any(c => c.Clave == "CodigoCancelacionVenta"))
+            {
+                context.Configuraciones.Add(new Configuracion
+                {
+                    Clave = "CodigoCancelacionVenta",
+                    Valor = "000000",
+                    Descripcion = "PIN para anular ventas o devolución parcial (solo admin). Cambiar en producción.",
+                    FechaCreacion = DateTime.Now,
+                    FechaActualizacion = DateTime.Now,
+                    UsuarioActualizacion = "sistema"
+                });
+                logger.LogInformation("Configuración Inicial creada: CodigoCancelacionVenta (000000)");
+            }
+
             // Sembrar Plantilla de WhatsApp inicial
             if (!context.PlantillasMensajeWhatsApp.Any())
             {

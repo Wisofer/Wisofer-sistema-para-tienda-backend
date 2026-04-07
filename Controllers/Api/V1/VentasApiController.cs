@@ -54,6 +54,42 @@ public class VentasApiController : BaseApiController
     [HttpPost("gestionar-pago")]
     public Task<IActionResult> GestionarPago([FromBody] ProcesarPagoVentaRequest request) => ProcesarPago(request);
 
+    /// <summary>Anula la venta completa (stock, reembolso en caja). Solo Admin. Requiere código igual a configuración CodigoCancelacionVenta.</summary>
+    [HttpPost("{id:int}/cancelar")]
+    [Authorize(Policy = "Admin")]
+    public async Task<IActionResult> CancelarVenta(int id, [FromBody] AnularVentaRequest request)
+    {
+        var userId = SecurityHelper.GetUserId(User);
+        if (!userId.HasValue) return FailResponse("Usuario no válido.", StatusCodes.Status401Unauthorized);
+        try
+        {
+            await _ventaService.AnularVentaAsync(id, request, userId.Value);
+            return OkResponse(new { id }, "Venta anulada.");
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
+    /// <summary>Devolución parcial: anula líneas por <c>detalleIds</c> (Id en ticket-detalle). Solo Admin.</summary>
+    [HttpPost("{id:int}/cancelar-parcial")]
+    [Authorize(Policy = "Admin")]
+    public async Task<IActionResult> CancelarVentaParcial(int id, [FromBody] AnularVentaParcialRequest request)
+    {
+        var userId = SecurityHelper.GetUserId(User);
+        if (!userId.HasValue) return FailResponse("Usuario no válido.", StatusCodes.Status401Unauthorized);
+        try
+        {
+            await _ventaService.AnularVentaParcialAsync(id, request, userId.Value);
+            return OkResponse(new { id }, "Líneas anuladas.");
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
     [HttpGet("{id:int}/ticket")]
     public async Task<IActionResult> DescargarTicket(int id)
     {

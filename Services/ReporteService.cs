@@ -64,17 +64,22 @@ public class ReporteService : IReporteService
 
         var netoPorVenta = await GetNetoPorVentaAsync(ventas);
 
-        return ventas.Select(v => new VentaDetalleReporte
+        return ventas.Select(v =>
         {
-            Id = v.Id,
-            Numero = v.Numero,
-            Fecha = v.Fecha,
-            Cliente = v.Cliente?.Nombre ?? "Cliente General",
-            Usuario = v.Usuario?.NombreUsuario,
-            SubtotalLineas = v.Total,
-            Total = netoPorVenta.GetValueOrDefault(v.Id, v.Total),
-            CantidadLineas = v.DetalleVentas.Count,
-            Estado = v.Estado
+            var activas = v.DetalleVentas.Where(d => !d.Anulado).ToList();
+            var subLineas = Math.Round(activas.Sum(x => x.Total), 2, MidpointRounding.AwayFromZero);
+            return new VentaDetalleReporte
+            {
+                Id = v.Id,
+                Numero = v.Numero,
+                Fecha = v.Fecha,
+                Cliente = v.Cliente?.Nombre ?? "Cliente General",
+                Usuario = v.Usuario?.NombreUsuario,
+                SubtotalLineas = subLineas,
+                Total = netoPorVenta.GetValueOrDefault(v.Id, subLineas),
+                CantidadLineas = activas.Count,
+                Estado = v.Estado
+            };
         }).ToList();
     }
 
@@ -94,6 +99,8 @@ public class ReporteService : IReporteService
         var netoMap = await GetNetoPorVentaAsync(new[] { v });
         var lineas = v.DetalleVentas.OrderBy(d => d.Id).Select(d => new VentaLineaReporte
         {
+            DetalleId = d.Id,
+            Anulado = d.Anulado,
             ProductoId = d.ProductoId,
             CodigoProducto = d.Producto?.Codigo ?? "",
             NombreProducto = d.Producto?.Nombre ?? "",
@@ -105,7 +112,9 @@ public class ReporteService : IReporteService
             TotalLinea = d.Total
         }).ToList();
 
-        var unidades = lineas.Sum(l => l.Cantidad);
+        var activas = lineas.Where(l => !l.Anulado).ToList();
+        var unidades = activas.Sum(l => l.Cantidad);
+        var subLineas = Math.Round(activas.Sum(l => l.TotalLinea), 2, MidpointRounding.AwayFromZero);
 
         return new VentaTicketCompletoReporte
         {
@@ -115,9 +124,9 @@ public class ReporteService : IReporteService
             Cliente = v.Cliente?.Nombre ?? "Cliente General",
             Cajero = v.Usuario?.NombreCompleto ?? v.Usuario?.NombreUsuario,
             Estado = v.Estado,
-            SubtotalLineas = v.Total,
-            TotalCobrado = netoMap.GetValueOrDefault(v.Id, v.Total),
-            CantidadLineas = lineas.Count,
+            SubtotalLineas = subLineas,
+            TotalCobrado = netoMap.GetValueOrDefault(v.Id, subLineas),
+            CantidadLineas = activas.Count,
             CantidadUnidades = unidades,
             Lineas = lineas
         };
@@ -130,7 +139,8 @@ public class ReporteService : IReporteService
         var ventasPorCategoriaRaw = await _context.DetalleVentas.AsNoTracking()
             .Include(dv => dv.Venta)
             .Include(dv => dv.Producto).ThenInclude(p => p.CategoriaProducto)
-            .Where(dv => (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) && 
+            .Where(dv => !dv.Anulado &&
+                         (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) && 
                          dv.Venta.Fecha >= fDesde && dv.Venta.Fecha <= fHasta)
             .Select(g => new {
                 Categoria = g.Producto.CategoriaProducto != null ? g.Producto.CategoriaProducto.Nombre : "Sin categoría",
@@ -155,7 +165,8 @@ public class ReporteService : IReporteService
         var filas = await _context.DetalleVentas.AsNoTracking()
             .Include(dv => dv.Venta)
             .Include(dv => dv.Producto).ThenInclude(p => p.CategoriaProducto)
-            .Where(dv => (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) &&
+            .Where(dv => !dv.Anulado &&
+                         (dv.Venta.Estado == SD.EstadoVentaPagado || dv.Venta.Estado == SD.EstadoVentaCompletada) &&
                          dv.Venta.Fecha >= fDesde && dv.Venta.Fecha <= fHasta)
             .Select(dv => new
             {
@@ -244,7 +255,8 @@ public class ReporteService : IReporteService
 
         return await _context.DetalleVentas.AsNoTracking()
             .Include(i => i.Venta).Include(i => i.Producto)
-            .Where(i => (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
+            .Where(i => !i.Anulado &&
+                        (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
                         i.Venta.Fecha >= fDesde && i.Venta.Fecha <= fHasta)
             .GroupBy(i => new { i.ProductoId, i.Producto.Nombre })
             .Select(g => new ProductoTopReporte { 

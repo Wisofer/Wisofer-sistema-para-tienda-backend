@@ -21,6 +21,9 @@ public class VentaDetalle
     public decimal Descuento { get; set; } = 0; // Descuento aplicado (opcional)
     public decimal Subtotal { get; set; } // Cantidad * PrecioUnitario - Descuento
     public decimal Total { get; set; } // Igual que Subtotal, para claridad
-    
+
+    /// <summary>Si es true, la línea no cuenta en totales ni reportes (devolución parcial).</summary>
+    public bool Anulado { get; set; }
+
     public DateTime FechaCreacion { get; set; } = DateTime.Now;
 }

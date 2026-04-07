@@ -131,6 +131,147 @@ public class VentaService : IVentaService
         return pago;
     }
 
+    public async Task AnularVentaAsync(int ventaId, AnularVentaRequest request, int usuarioId)
+    {
+        ValidarCodigoCancelacion(request.Codigo);
+
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var venta = await _context.Ventas
+                .Include(v => v.DetalleVentas).ThenInclude(d => d.Producto)
+                .FirstOrDefaultAsync(v => v.Id == ventaId);
+
+            if (venta == null) throw new Exception("Venta no encontrada.");
+            if (venta.Estado == SD.EstadoVentaAnulada) throw new Exception("La venta ya está anulada.");
+            if (venta.Estado == SD.EstadoVentaPendiente)
+                throw new Exception("Solo se pueden anular ventas que ya fueron cobradas (ticket con pago).");
+            if (venta.Estado != SD.EstadoVentaPagado && venta.Estado != SD.EstadoVentaCompletada)
+                throw new Exception("Solo se pueden anular ventas cobradas.");
+
+            foreach (var d in venta.DetalleVentas.Where(x => !x.Anulado))
+            {
+                _inventarioService.RestaurarStockPorDevolucionVenta(
+                    d.ProductoId,
+                    d.ProductoVarianteId,
+                    d.Cantidad,
+                    usuarioId,
+                    venta.Numero,
+                    $"Anulación venta {venta.Numero}");
+            }
+
+            venta.Estado = SD.EstadoVentaAnulada;
+            venta.FechaActualizacion = DateTime.Now;
+            if (!string.IsNullOrWhiteSpace(request.Motivo))
+            {
+                var m = request.Motivo.Trim();
+                venta.Observaciones = string.IsNullOrWhiteSpace(venta.Observaciones)
+                    ? $"[Anulada] {m}"
+                    : $"{venta.Observaciones} | [Anulada] {m}";
+            }
+
+            var pagos = await _context.Pagos
+                .Include(p => p.PagoVentas)
+                .Where(p => p.VentaId == ventaId)
+                .OrderBy(p => p.Id)
+                .ToListAsync();
+
+            var neto = CobroVentasHelper.NetoCobradoPorVenta(new[] { ventaId }, pagos).GetValueOrDefault(ventaId, 0m);
+            neto = Math.Round(neto, 2, MidpointRounding.AwayFromZero);
+            if (neto > 0)
+            {
+                var original = pagos.First();
+                _context.Pagos.Add(CrearPagoReembolso(ventaId, original, -neto, venta.Numero));
+            }
+
+            await _context.SaveChangesAsync();
+            await tx.CommitAsync();
+        }
+        catch
+        {
+            await tx.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task AnularVentaParcialAsync(int ventaId, AnularVentaParcialRequest request, int usuarioId)
+    {
+        ValidarCodigoCancelacion(request.Codigo);
+
+        if (request.DetalleIds == null || request.DetalleIds.Count == 0)
+            throw new Exception("Indique al menos una línea de detalle (detalleIds).");
+
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var venta = await _context.Ventas
+                .Include(v => v.DetalleVentas).ThenInclude(d => d.Producto)
+                .FirstOrDefaultAsync(v => v.Id == ventaId);
+
+            if (venta == null) throw new Exception("Venta no encontrada.");
+            if (venta.Estado == SD.EstadoVentaAnulada) throw new Exception("La venta ya está anulada.");
+            if (venta.Estado == SD.EstadoVentaPendiente)
+                throw new Exception("Solo se pueden anular ventas que ya fueron cobradas (ticket con pago).");
+            if (venta.Estado != SD.EstadoVentaPagado && venta.Estado != SD.EstadoVentaCompletada)
+                throw new Exception("Solo se pueden anular ventas cobradas.");
+
+            decimal montoDevuelto = 0;
+
+            foreach (var did in request.DetalleIds.Distinct())
+            {
+                var d = venta.DetalleVentas.FirstOrDefault(x => x.Id == did);
+                if (d == null) throw new Exception($"La línea {did} no pertenece a la venta.");
+                if (d.Anulado) throw new Exception($"La línea {did} ya fue anulada.");
+
+                _inventarioService.RestaurarStockPorDevolucionVenta(
+                    d.ProductoId,
+                    d.ProductoVarianteId,
+                    d.Cantidad,
+                    usuarioId,
+                    venta.Numero,
+                    $"Devolución parcial {venta.Numero}");
+
+                d.Anulado = true;
+                montoDevuelto += d.Total;
+            }
+
+            montoDevuelto = Math.Round(montoDevuelto, 2, MidpointRounding.AwayFromZero);
+            if (montoDevuelto <= 0) throw new Exception("No hay monto a devolver.");
+
+            RecalcularTotalesVenta(venta);
+
+            var pagos = await _context.Pagos
+                .Include(p => p.PagoVentas)
+                .Where(p => p.VentaId == ventaId)
+                .OrderBy(p => p.Id)
+                .ToListAsync();
+            if (!pagos.Any()) throw new Exception("No hay pagos registrados para esta venta.");
+
+            var original = pagos.First();
+            _context.Pagos.Add(CrearPagoReembolso(ventaId, original, -montoDevuelto, venta.Numero));
+
+            if (!venta.DetalleVentas.Any(x => !x.Anulado))
+                venta.Estado = SD.EstadoVentaAnulada;
+
+            venta.FechaActualizacion = DateTime.Now;
+            if (!string.IsNullOrWhiteSpace(request.Motivo))
+            {
+                var m = request.Motivo.Trim();
+                venta.Observaciones = string.IsNullOrWhiteSpace(venta.Observaciones)
+                    ? $"[Devolución parcial] {m}"
+                    : $"{venta.Observaciones} | [Devolución parcial] {m}";
+            }
+
+            await _context.SaveChangesAsync();
+            await tx.CommitAsync();
+        }
+        catch
+        {
+            await tx.RollbackAsync();
+            throw;
+        }
+    }
+
     public string GenerarNumeroTicket()
     {
         var ultimo = _context.Ventas
@@ -258,6 +399,42 @@ public class VentaService : IVentaService
             vuelto = Math.Round(montoPagado - totalCordobas, 2, MidpointRounding.AwayFromZero);
 
         return vuelto < 0 ? 0 : vuelto;
+    }
+
+    private void ValidarCodigoCancelacion(string? codigo)
+    {
+        var esperado = _configService.ObtenerValor("CodigoCancelacionVenta")?.Trim();
+        if (string.IsNullOrEmpty(esperado))
+            throw new Exception("Configure la clave CodigoCancelacionVenta en configuraciones del sistema.");
+        if (string.IsNullOrWhiteSpace(codigo) || !string.Equals(codigo.Trim(), esperado, StringComparison.Ordinal))
+            throw new Exception("Código de cancelación inválido.");
+    }
+
+    private static void RecalcularTotalesVenta(Venta venta)
+    {
+        var sum = venta.DetalleVentas.Where(d => !d.Anulado).Sum(d => d.Total);
+        sum = Math.Round(sum, 2, MidpointRounding.AwayFromZero);
+        venta.Monto = sum;
+        venta.Subtotal = sum;
+        venta.Total = sum;
+    }
+
+    private static Pago CrearPagoReembolso(int ventaId, Pago original, decimal montoNegativo, string numeroTicket)
+    {
+        return new Pago
+        {
+            VentaId = ventaId,
+            Monto = montoNegativo,
+            Moneda = original.Moneda,
+            TipoPago = original.TipoPago,
+            TipoCambio = original.TipoCambio,
+            FechaPago = DateTime.Now,
+            Observaciones = $"Reembolso / anulación ticket {numeroTicket}",
+            DescuentoMonto = 0,
+            DescuentoMotivo = null,
+            Banco = original.Banco,
+            TipoCuenta = original.TipoCuenta
+        };
     }
 
     #endregion

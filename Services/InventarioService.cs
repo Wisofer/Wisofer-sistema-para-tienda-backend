@@ -162,6 +162,70 @@ public class InventarioService : IInventarioService
         return movimiento;
     }
 
+    public void RestaurarStockPorDevolucionVenta(int productoId, int? varianteId, int cantidad, int usuarioId, string numeroReferencia, string? observaciones)
+    {
+        if (cantidad <= 0) return;
+
+        var producto = _context.Productos.Include(p => p.Variantes).FirstOrDefault(p => p.Id == productoId);
+        if (producto == null) throw new Exception("Producto no encontrado");
+        if (!producto.ControlarStock) return;
+
+        int stockAnterior;
+        int stockNuevo;
+
+        if (varianteId.HasValue)
+        {
+            var variante = producto.Variantes.FirstOrDefault(v => v.Id == varianteId.Value);
+            if (variante == null) throw new Exception("Variante no encontrada");
+
+            stockAnterior = variante.Stock;
+            stockNuevo = stockAnterior + cantidad;
+            variante.Stock = stockNuevo;
+        }
+        else if (producto.Variantes.Count == 1)
+        {
+            var variante = producto.Variantes.First();
+            stockAnterior = variante.Stock;
+            stockNuevo = stockAnterior + cantidad;
+            variante.Stock = stockNuevo;
+        }
+        else if (producto.Variantes.Count == 0)
+        {
+            stockAnterior = producto.StockTotal;
+            stockNuevo = stockAnterior + cantidad;
+            producto.StockTotal = stockNuevo;
+        }
+        else
+        {
+            throw new Exception("Debe indicar la variante (talla/color) para este producto.");
+        }
+
+        producto.StockTotal = producto.Variantes.Any()
+            ? producto.Variantes.Sum(v => v.Stock)
+            : producto.StockTotal;
+
+        var movimiento = new MovimientoInventario
+        {
+            ProductoId = productoId,
+            ProductoVarianteId = varianteId,
+            Tipo = SD.TipoMovimientoEntrada,
+            Subtipo = SD.SubtipoMovimientoDevolucion,
+            Cantidad = cantidad,
+            CostoUnitario = 0,
+            CostoTotal = 0,
+            Fecha = DateTime.Now,
+            UsuarioId = usuarioId,
+            NumeroReferencia = numeroReferencia,
+            Observaciones = observaciones,
+            StockAnterior = stockAnterior,
+            StockNuevo = stockNuevo,
+            ProveedorId = null
+        };
+
+        _context.MovimientosInventario.Add(movimiento);
+        _context.SaveChanges();
+    }
+
     public MovimientoInventario RegistrarAjuste(int productoId, int? varianteId, int stockFisicoReal, string? observaciones, int usuarioId)
     {
         if (stockFisicoReal < 0)
