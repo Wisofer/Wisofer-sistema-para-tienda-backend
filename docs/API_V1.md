@@ -52,6 +52,8 @@ Respuesta (`data`) incluye:
 - `expiresAt`
 - `refreshTokenExpiresAt`
 
+Vidas por defecto (configurables en `JwtSettings` del servidor): **access JWT** ≈ `ExpirationInMinutes` (por defecto **600 min ≈ 10 h** de jornada); **refresh** ≈ `RefreshTokenExpirationInDays` (por defecto **1 día**). Para **8 h** usar `480`.
+
 ### 2.2 Usar token en cada request protegida
 
 Header:

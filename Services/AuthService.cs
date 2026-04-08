@@ -9,11 +9,14 @@ namespace SistemaDeTienda.Services;
 public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
-    private const int RefreshTokenDays = 15;
+    private readonly int _refreshTokenExpirationDays;
 
-    public AuthService(ApplicationDbContext context)
+    public AuthService(ApplicationDbContext context, IConfiguration configuration)
     {
         _context = context;
+        var raw = configuration["JwtSettings:RefreshTokenExpirationInDays"];
+        _refreshTokenExpirationDays =
+            int.TryParse(raw, out var d) && d > 0 && d <= 365 ? d : 1;
     }
 
     public Usuario? ValidarUsuario(string nombreUsuario, string contrasena)
@@ -55,7 +58,7 @@ public class AuthService : IAuthService
             TokenHash = tokenHash,
             JwtId = jwtId,
             CreadoEnUtc = DateTime.UtcNow,
-            ExpiraEnUtc = DateTime.UtcNow.AddDays(RefreshTokenDays)
+            ExpiraEnUtc = DateTime.UtcNow.AddDays(_refreshTokenExpirationDays)
         };
 
         _context.RefreshTokens.Add(refreshToken);

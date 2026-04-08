@@ -21,7 +21,7 @@ public class JwtTokenService : IJwtTokenService
         var secret = _configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JwtSettings:SecretKey no configurado.");
         var issuer = _configuration["JwtSettings:Issuer"] ?? "ClothingStorePOS";
         var audience = _configuration["JwtSettings:Audience"] ?? "ClothingStorePOSUsers";
-        var expirationMinutes = int.TryParse(_configuration["JwtSettings:ExpirationInMinutes"], out var mins) ? mins : 60;
+        var expirationMinutes = int.TryParse(_configuration["JwtSettings:ExpirationInMinutes"], out var mins) ? mins : 600;
 
         var now = DateTime.UtcNow;
         var expires = now.AddMinutes(expirationMinutes);
