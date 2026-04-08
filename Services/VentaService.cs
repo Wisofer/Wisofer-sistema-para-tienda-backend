@@ -90,7 +90,10 @@ public class VentaService : IVentaService
         if (!venta.DetalleVentas.Any())
             throw new Exception("No se puede cobrar una venta sin items.");
 
-        var subtotalVenta = Math.Round(venta.Total, 2, MidpointRounding.AwayFromZero);
+        var subtotalVenta = Math.Round(
+            venta.DetalleVentas.Where(d => !d.Anulado).Sum(d => d.Total),
+            2,
+            MidpointRounding.AwayFromZero);
         var descuento = Math.Round(request.DescuentoMonto ?? 0m, 2, MidpointRounding.AwayFromZero);
 
         if (descuento > subtotalVenta + ToleranciaMonto)
@@ -126,6 +129,12 @@ public class VentaService : IVentaService
         _context.Pagos.Add(pago);
         venta.Estado = SD.EstadoVentaPagado;
         venta.FechaActualizacion = DateTime.Now;
+        // Subtotal bruto, descuento y total neto cobrado (alineado con Pago y ticket)
+        venta.Monto = subtotalVenta;
+        venta.Subtotal = subtotalVenta;
+        venta.Descuento = descuento;
+        venta.Total = totalNetoCordobas;
+        venta.MetodoPago = request.TipoPago.Trim();
 
         await _context.SaveChangesAsync();
         return pago;
@@ -414,9 +423,32 @@ public class VentaService : IVentaService
     {
         var sum = venta.DetalleVentas.Where(d => !d.Anulado).Sum(d => d.Total);
         sum = Math.Round(sum, 2, MidpointRounding.AwayFromZero);
+        var oldGross = venta.Monto;
+        var descuentoPrev = venta.Descuento;
+
         venta.Monto = sum;
         venta.Subtotal = sum;
-        venta.Total = sum;
+
+        if (sum <= 0)
+        {
+            venta.Descuento = 0;
+            venta.Total = 0;
+            return;
+        }
+
+        if (descuentoPrev <= 0 || oldGross <= 0)
+        {
+            venta.Descuento = 0;
+            venta.Total = sum;
+            return;
+        }
+
+        var ratio = sum / oldGross;
+        if (ratio > 1m) ratio = 1m;
+        var nuevoDesc = Math.Round(descuentoPrev * ratio, 2, MidpointRounding.AwayFromZero);
+        if (nuevoDesc > sum) nuevoDesc = sum;
+        venta.Descuento = nuevoDesc;
+        venta.Total = Math.Round(sum - nuevoDesc, 2, MidpointRounding.AwayFromZero);
     }
 
     private static Pago CrearPagoReembolso(int ventaId, Pago original, decimal montoNegativo, string numeroTicket)

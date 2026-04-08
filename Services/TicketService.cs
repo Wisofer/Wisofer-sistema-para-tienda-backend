@@ -35,11 +35,18 @@ public class TicketService : ITicketService
         if (venta == null)
             throw new Exception("Venta no encontrada para la generación del ticket.");
 
-        var pago = await _context.Pagos.FirstOrDefaultAsync(p => p.VentaId == ventaId);
+        var pago = await _context.Pagos
+            .Where(p => p.VentaId == ventaId)
+            .OrderBy(p => p.Id)
+            .FirstOrDefaultAsync();
         var nombreCajero = venta.Usuario?.NombreCompleto ?? "—";
         var nombreCliente = venta.Cliente?.Nombre ?? VentaClienteLabels.SinIdentificar;
-        var subtotalLineas = venta.DetalleVentas.Sum(d => d.Total);
-        var metodo = (pago?.TipoPago ?? "EFECTIVO").ToUpperInvariant();
+        var detallesActivos = venta.DetalleVentas.Where(d => !d.Anulado).ToList();
+        var subtotalLineas = detallesActivos.Sum(d => d.Total);
+        var descuentoMonto = pago?.DescuentoMonto ?? venta.Descuento;
+        var descuentoMotivo = pago?.DescuentoMotivo;
+        var totalNetoCobrado = pago != null ? pago.Monto : venta.Total;
+        var metodo = (pago?.TipoPago ?? venta.MetodoPago ?? "EFECTIVO").ToUpperInvariant();
         var fechaPie = pago?.FechaPago ?? venta.Fecha;
 
         var logoPath = Path.Combine(_env.WebRootPath ?? "", "images", "logo.png");
@@ -89,7 +96,7 @@ public class TicketService : ITicketService
                     col.Item().PaddingVertical(2).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Ítems ===
-                    foreach (var det in venta.DetalleVentas)
+                    foreach (var det in detallesActivos)
                     {
                         var varianteTalla = det.ProductoVariante?.Talla;
                         var variacionTxt = varianteTalla != null ? $" ({varianteTalla})" : "";
@@ -105,17 +112,30 @@ public class TicketService : ITicketService
 
                     col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
-                    // === Subtotal / Total ===
+                    // === Subtotal / Descuento / Total neto (alineado con cobro y Venta) ===
                     col.Item().Row(r =>
                     {
                         r.RelativeItem().Text("SUBTOTAL:").Bold();
                         r.ConstantItem(70).AlignRight().Text($"C${subtotalLineas:N2}").Bold();
                     });
 
+                    if (descuentoMonto > 0.005m)
+                    {
+                        col.Item().PaddingTop(2).Row(r =>
+                        {
+                            r.RelativeItem().Text("DESCUENTO:").Bold();
+                            r.ConstantItem(70).AlignRight().Text($"-C${descuentoMonto:N2}").Bold();
+                        });
+                        if (!string.IsNullOrWhiteSpace(descuentoMotivo))
+                        {
+                            col.Item().PaddingTop(1).Text(Truncar(descuentoMotivo!.Trim(), 40)).FontSize(7).Italic();
+                        }
+                    }
+
                     col.Item().PaddingTop(4).Row(r =>
                     {
                         r.RelativeItem().Text("TOTAL A PAGAR:").Bold().FontSize(9);
-                        r.ConstantItem(70).AlignRight().Text($"C${venta.Total:N2}").Bold().FontSize(9);
+                        r.ConstantItem(70).AlignRight().Text($"C${totalNetoCobrado:N2}").Bold().FontSize(9);
                     });
 
                     col.Item().PaddingTop(6).Text($"MÉTODO: {metodo}");
