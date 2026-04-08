@@ -1,6 +1,7 @@
 using SistemaDeTienda.Data;
 using SistemaDeTienda.Models.Api;
 using SistemaDeTienda.Models.Entities;
+using SistemaDeTienda.Services;
 using SistemaDeTienda.Services.IServices;
 using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +16,16 @@ public class ProductosApiController : BaseApiController
 {
     private readonly ApplicationDbContext _context;
     private readonly IStorageService _storageService;
+    private readonly ExcelExportService _excelExportService;
 
     public ProductosApiController(
         ApplicationDbContext context,
-        IStorageService storageService)
+        IStorageService storageService,
+        ExcelExportService excelExportService)
     {
         _context = context;
         _storageService = storageService;
+        _excelExportService = excelExportService;
     }
 
     [HttpGet]
@@ -85,6 +89,48 @@ public class ProductosApiController : BaseApiController
             TotalItems = total,
             TotalPages = (int)Math.Ceiling((double)total / pageSize)
         });
+    }
+
+    /// <summary>Excel de inventario (producto a nivel cabecera). Respeta los mismos filtros que el listado. Solo Administrador.</summary>
+    [HttpGet("exportar")]
+    [Authorize(Policy = "Admin")]
+    public IActionResult ExportarInventario(
+        [FromQuery] string? search,
+        [FromQuery] int? categoriaId,
+        [FromQuery] bool? activos)
+    {
+        var query = _context.Productos
+            .AsNoTracking()
+            .Include(p => p.CategoriaProducto)
+            .Include(p => p.Proveedor)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var q = search.Trim().ToLower();
+            query = query.Where(p => p.Nombre.ToLower().Contains(q) || (p.Codigo != null && p.Codigo.ToLower().Contains(q)));
+        }
+
+        if (categoriaId.HasValue) query = query.Where(p => p.CategoriaProductoId == categoriaId.Value);
+        if (activos.HasValue) query = query.Where(p => p.Activo == activos.Value);
+
+        var list = query.OrderBy(p => p.Nombre).ToList();
+        var rows = list.Select(p => (object)new
+        {
+            p.Codigo,
+            p.Nombre,
+            Categoria = p.CategoriaProducto != null ? p.CategoriaProducto.Nombre : "Sin Categoría",
+            Proveedor = p.Proveedor != null ? p.Proveedor.Nombre : "Sin Proveedor",
+            p.PrecioCompra,
+            Precio = p.Precio,
+            Stock = p.StockTotal,
+            p.StockMinimo,
+            p.Activo
+        }).ToList();
+
+        var bytes = _excelExportService.ExportarProductos(rows);
+        var name = $"inventario_productos_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+        return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name);
     }
 
     [HttpGet("{id:int}")]

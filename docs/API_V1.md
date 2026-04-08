@@ -231,11 +231,8 @@ Historial de movimientos de inventario de un producto.
 ### `GET /productos/movimientos` (Admin)
 Listado global paginado de movimientos de inventario.
 
-### `GET /productos/exportar-excel` (Admin)
-Exporta el catálogo de productos a Excel, incluyendo:
-- código, nombre, categoría
-- precioCompra, precioVenta
-- stock, stockMinimo, controlarStock, estado
+### `GET /productos/exportar` (Admin)
+Descarga **.xlsx** con el inventario (mismos filtros opcionales que `GET /productos`: `search`, `categoriaId`, `activos`). Columnas: código, nombre, **categoría**, proveedor, precio compra, precio venta, stock total, stock mínimo, estado.
 
 Compatibilidad:
 - si en `POST/PUT` se envía solo `precio`, backend lo interpreta como `precioVenta`.
