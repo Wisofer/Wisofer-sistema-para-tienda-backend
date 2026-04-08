@@ -1,4 +1,5 @@
 using SistemaDeTienda.Models.Api;
+using SistemaDeTienda.Services;
 using SistemaDeTienda.Services.IServices;
 using SistemaDeTienda.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +13,16 @@ namespace SistemaDeTienda.Controllers.Api.V1;
 public class CajaApiController : BaseApiController
 {
     private readonly ICajaService _cajaService;
+    private readonly ExcelExportService _excelExportService;
     private readonly ILogger<CajaApiController> _logger;
 
-    public CajaApiController(ICajaService cajaService, ILogger<CajaApiController> logger)
+    public CajaApiController(
+        ICajaService cajaService,
+        ExcelExportService excelExportService,
+        ILogger<CajaApiController> logger)
     {
         _cajaService = cajaService;
+        _excelExportService = excelExportService;
         _logger = logger;
     }
 
@@ -106,11 +112,15 @@ public class CajaApiController : BaseApiController
     }
 
     [HttpGet("historial")]
-    public async Task<IActionResult> Historial([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> Historial(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] DateTime? desde = null,
+        [FromQuery] DateTime? hasta = null)
     {
         try
         {
-            var result = await _cajaService.ObtenerHistorialAsync(page, pageSize);
+            var result = await _cajaService.ObtenerHistorialAsync(page, pageSize, desde, hasta);
             return OkResponse(new PagedResult<object>
             {
                 Items = result.Items.Select(c => (object)new
@@ -129,6 +139,38 @@ public class CajaApiController : BaseApiController
                 TotalItems = result.TotalItems,
                 TotalPages = result.TotalPages
             });
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
+    /// <summary>Excel de historial de cierres; mismos criterios de fecha que el listado (filtro sobre fecha de cierre).</summary>
+    [HttpGet("historial/exportar")]
+    public async Task<IActionResult> ExportarHistorial(
+        [FromQuery] DateTime? desde,
+        [FromQuery] DateTime? hasta)
+    {
+        try
+        {
+            var cierres = await _cajaService.ObtenerHistorialParaExportAsync(desde, hasta);
+            var rows = cierres.Select(c => (dynamic)new
+            {
+                id = c.Id,
+                fecha = c.FechaHoraCierre,
+                estado = c.Estado,
+                montoInicial = c.MontoInicial,
+                totalVentas = c.TotalGeneral,
+                montoEsperado = c.MontoEsperado,
+                montoReal = c.MontoReal,
+                diferencia = c.Diferencia,
+                usuario = c.Usuario != null ? c.Usuario.NombreCompleto : ""
+            }).ToList();
+
+            var bytes = _excelExportService.ExportarHistorialCierres(rows);
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"historial_cierres_caja_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
         }
         catch (Exception ex)
         {

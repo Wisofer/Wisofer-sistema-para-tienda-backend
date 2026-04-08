@@ -175,6 +175,8 @@ public class VentaPorCategoriaProductoDesglose
 public class ProductoTopReporte
 {
     public int ProductoId { get; set; }
+    /// <summary>Nombre de la categoría del producto (vacío si no tiene).</summary>
+    public string Categoria { get; set; } = string.Empty;
     public string Producto { get; set; } = string.Empty;
     public int Cantidad { get; set; }
     public decimal Venta { get; set; }

@@ -26,9 +26,14 @@ public interface ICajaService
     Task<CajaPreviewResponse> ObtenerPreviewCierreAsync();
 
     /// <summary>
-    /// Obtiene el historial de cierres de caja paginado.
+    /// Obtiene el historial de cierres de caja paginado (filtro opcional por <see cref="CierreCaja.FechaCierre"/>).
     /// </summary>
-    Task<PagedResult<CierreCaja>> ObtenerHistorialAsync(int page, int pageSize);
+    Task<PagedResult<CierreCaja>> ObtenerHistorialAsync(int page, int pageSize, DateTime? desde = null, DateTime? hasta = null);
+
+    /// <summary>
+    /// Historial para exportación Excel, opcionalmente filtrado por rango de <see cref="CierreCaja.FechaCierre"/> (fecha calendario).
+    /// </summary>
+    Task<List<CierreCaja>> ObtenerHistorialParaExportAsync(DateTime? desde, DateTime? hasta);
 }
 
 public class CajaEstadoResponse

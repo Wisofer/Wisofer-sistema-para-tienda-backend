@@ -177,7 +177,7 @@ public class ExcelExportService
     public byte[] ExportarTopProductos(IEnumerable<dynamic> items)
     {
         using var package = new ExcelPackage();
-        string[] headers = { "Ranking", "Producto", "Cant. Vendida", "Venta Total (C$)" };
+        string[] headers = { "Ranking", "Categoría", "Producto", "Cant. Vendida", "Venta Total (C$)" };
         var worksheet = PrepareSheet(package, "Top Productos", headers, HeaderBlue);
 
         int row = 2;
@@ -185,13 +185,14 @@ public class ExcelExportService
         foreach (var item in items)
         {
             worksheet.Cells[row, 1].Value = rank++;
-            worksheet.Cells[row, 2].Value = item.Producto ?? "";
-            worksheet.Cells[row, 3].Value = item.Cantidad ?? 0;
-            SetCellMoney(worksheet, row, 4, item.Venta);
+            worksheet.Cells[row, 2].Value = item.Categoria ?? "";
+            worksheet.Cells[row, 3].Value = item.Producto ?? "";
+            worksheet.Cells[row, 4].Value = item.Cantidad ?? 0;
+            SetCellMoney(worksheet, row, 5, item.Venta);
             row++;
         }
 
-        if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 3, 4 });
+        if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 4, 5 });
         ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Top de Productos Más Vendidos");
         return package.GetAsByteArray();
     }

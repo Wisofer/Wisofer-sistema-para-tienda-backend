@@ -400,6 +400,10 @@ Historial de cierres (paginado).
 Query:
 - `page` (default 1)
 - `pageSize` (default 20, min 5, max 100)
+- `desde`, `hasta` (opcional, fecha): filtran por `fechaCierre` (solo fecha calendario).
+
+### `GET /caja/historial/exportar` (Administrador o Cajero)
+Descarga Excel del historial de cierres (mismos filtros opcionales `desde` / `hasta` que el listado). Respuesta: archivo `.xlsx`.
 
 ### `GET /caja/cierre/{id}` (Admin)
 Detalle de un cierre con lista de pagos del día.
@@ -603,6 +607,8 @@ Query:
 ### `GET /reportes/productos-top`
 Top productos más vendidos por rango.
 
+Cada ítem incluye **`productoId`**, **`categoria`** (nombre de la categoría del producto, o vacío si no tiene), **`producto`**, **`cantidad`** y **`venta`**.
+
 El campo **`venta`** agrega **monto de líneas** (`FacturaServicios.Monto`), es decir valor de consumo por producto, no el neto cobrado después de descuentos a nivel ticket.
 
 Query:
@@ -611,7 +617,7 @@ Query:
 - `top` (default 10)
 
 ### `GET /reportes/productos-top/excel`
-Descarga top de productos en Excel.
+Descarga top de productos en Excel (columnas: ranking, categoría, producto, cantidad vendida, venta total).
 Query:
 - `desde`
 - `hasta`

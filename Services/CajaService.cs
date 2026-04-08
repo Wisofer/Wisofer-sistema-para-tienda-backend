@@ -113,13 +113,31 @@ public class CajaService : ICajaService
         };
     }
 
-    public async Task<PagedResult<CierreCaja>> ObtenerHistorialAsync(int page, int pageSize)
+    private IQueryable<CierreCaja> BuildHistorialQuery(DateTime? desde, DateTime? hasta)
     {
         var query = _context.CierresCaja
             .AsNoTracking()
             .Include(c => c.Usuario)
-            .OrderByDescending(c => c.FechaCierre);
+            .AsQueryable();
 
+        if (desde.HasValue)
+        {
+            var d = desde.Value.Date;
+            query = query.Where(c => c.FechaCierre >= d);
+        }
+
+        if (hasta.HasValue)
+        {
+            var h = hasta.Value.Date;
+            query = query.Where(c => c.FechaCierre <= h);
+        }
+
+        return query.OrderByDescending(c => c.FechaCierre).ThenByDescending(c => c.FechaHoraCierre);
+    }
+
+    public async Task<PagedResult<CierreCaja>> ObtenerHistorialAsync(int page, int pageSize, DateTime? desde = null, DateTime? hasta = null)
+    {
+        var query = BuildHistorialQuery(desde, hasta);
         var total = await query.CountAsync();
         var items = await query
             .Skip((page - 1) * pageSize)
@@ -134,6 +152,11 @@ public class CajaService : ICajaService
             TotalItems = total,
             TotalPages = (int)Math.Ceiling((double)total / pageSize)
         };
+    }
+
+    public async Task<List<CierreCaja>> ObtenerHistorialParaExportAsync(DateTime? desde, DateTime? hasta)
+    {
+        return await BuildHistorialQuery(desde, hasta).ToListAsync();
     }
 
     private async Task<decimal> ObtenerTipoCambioAsync()

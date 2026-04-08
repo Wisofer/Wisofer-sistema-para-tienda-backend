@@ -255,16 +255,22 @@ public class ReporteService : IReporteService
         var limit = Math.Min(Math.Max(top, 1), 100);
 
         return await _context.DetalleVentas.AsNoTracking()
-            .Include(i => i.Venta).Include(i => i.Producto)
+            .Include(i => i.Venta)
+            .Include(i => i.Producto).ThenInclude(p => p!.CategoriaProducto)
             .Where(i => !i.Anulado &&
                         (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
                         i.Venta.Fecha >= fDesde && i.Venta.Fecha <= fHasta)
-            .GroupBy(i => new { i.ProductoId, i.Producto.Nombre })
-            .Select(g => new ProductoTopReporte { 
-                ProductoId = g.Key.ProductoId, 
-                Producto = g.Key.Nombre, 
-                Cantidad = g.Sum(x => x.Cantidad), 
-                Venta = g.Sum(x => x.Total) 
+            .GroupBy(i => i.ProductoId)
+            .Select(g => new ProductoTopReporte
+            {
+                ProductoId = g.Key,
+                Producto = g.Select(x => x.Producto != null ? x.Producto.Nombre : "Producto eliminado").First(),
+                Categoria = g.Select(x =>
+                    x.Producto != null && x.Producto.CategoriaProducto != null
+                        ? x.Producto.CategoriaProducto.Nombre
+                        : "").First(),
+                Cantidad = g.Sum(x => x.Cantidad),
+                Venta = g.Sum(x => x.Total)
             })
             .OrderByDescending(x => x.Cantidad)
             .Take(limit)
@@ -299,7 +305,13 @@ public class ReporteService : IReporteService
 
     public byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items)
     {
-        return _excelExportService.ExportarTopProductos(items.Select(x => new { Producto = x.Producto, Cantidad = x.Cantidad, Venta = x.Venta }).ToList());
+        return _excelExportService.ExportarTopProductos(items.Select(x => new
+        {
+            x.Categoria,
+            x.Producto,
+            Cantidad = x.Cantidad,
+            Venta = x.Venta
+        }).ToList());
     }
 
     public byte[] GenerarExcelVentasPorVendedor(DateTime desde, DateTime hasta, List<VentaPorVendedorReporte> items)
