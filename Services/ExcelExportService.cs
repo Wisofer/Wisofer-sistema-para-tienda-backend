@@ -65,7 +65,7 @@ public class ExcelExportService
     public byte[] ExportarProductos(IEnumerable<dynamic> productos)
     {
         using var package = new ExcelPackage();
-        string[] headers = { "Código", "Nombre", "Categoría", "Proveedor", "Precio Compra", "Precio Venta", "Stock Total", "Stock Mínimo", "Estado" };
+        string[] headers = { "Código", "Nombre", "Categoría", "Precio Compra", "Precio Venta", "Stock Total", "Stock Mínimo", "Estado" };
         var worksheet = PrepareSheet(package, "Productos", headers, HeaderGreen);
 
         int row = 2;
@@ -74,12 +74,11 @@ public class ExcelExportService
             worksheet.Cells[row, 1].Value = GetValueSafe(p, "Codigo")?.ToString() ?? "";
             worksheet.Cells[row, 2].Value = GetValueSafe(p, "Nombre")?.ToString() ?? "";
             worksheet.Cells[row, 3].Value = GetValueSafe(p, "Categoria")?.ToString() ?? "";
-            worksheet.Cells[row, 4].Value = GetValueSafe(p, "Proveedor")?.ToString() ?? "";
-            SetCellMoney(worksheet, row, 5, GetValueSafe(p, "PrecioCompra"));
-            SetCellMoney(worksheet, row, 6, GetValueSafe(p, "Precio") ?? GetValueSafe(p, "PrecioVenta"));
-            worksheet.Cells[row, 7].Value = GetValueSafe(p, "Stock") ?? GetValueSafe(p, "StockTotal") ?? 0;
-            worksheet.Cells[row, 8].Value = GetValueSafe(p, "StockMinimo") ?? 0;
-            worksheet.Cells[row, 9].Value = (GetValueSafe(p, "Activo") as bool? == true) ? "Activo" : "Inactivo";
+            SetCellMoney(worksheet, row, 4, GetValueSafe(p, "PrecioCompra"));
+            SetCellMoney(worksheet, row, 5, GetValueSafe(p, "Precio") ?? GetValueSafe(p, "PrecioVenta"));
+            worksheet.Cells[row, 6].Value = GetValueSafe(p, "Stock") ?? GetValueSafe(p, "StockTotal") ?? 0;
+            worksheet.Cells[row, 7].Value = GetValueSafe(p, "StockMinimo") ?? 0;
+            worksheet.Cells[row, 8].Value = (GetValueSafe(p, "Activo") as bool? == true) ? "Activo" : "Inactivo";
             row++;
         }
 
