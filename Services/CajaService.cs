@@ -159,6 +159,14 @@ public class CajaService : ICajaService
         return await BuildHistorialQuery(desde, hasta).ToListAsync();
     }
 
+    public async Task<CierreCaja?> ObtenerCierrePorIdAsync(int id)
+    {
+        return await _context.CierresCaja
+            .AsNoTracking()
+            .Include(c => c.Usuario)
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
+
     private async Task<decimal> ObtenerTipoCambioAsync()
     {
         var config = await _context.Configuraciones.FirstOrDefaultAsync(c => c.Clave == "TipoCambioDolar");

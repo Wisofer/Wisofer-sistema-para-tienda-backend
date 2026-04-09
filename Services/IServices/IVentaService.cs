@@ -50,7 +50,18 @@ public class ProcesarPagoVentaRequest
     public string? Banco { get; set; }
     public string? TipoCuenta { get; set; }
     public string? Observaciones { get; set; }
+
+    /// <summary>
+    /// Descuento fijo en córdobas sobre el subtotal de la venta. Ignorado si viene <see cref="DescuentoPorcentaje"/>.
+    /// </summary>
     public decimal? DescuentoMonto { get; set; }
+
+    /// <summary>
+    /// Si se envía (0–100), el servidor calcula el descuento en C$ como porcentaje del subtotal.
+    /// Tiene prioridad sobre <see cref="DescuentoMonto"/>.
+    /// </summary>
+    public decimal? DescuentoPorcentaje { get; set; }
+
     public string? DescuentoMotivo { get; set; }
 }
 

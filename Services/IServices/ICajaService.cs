@@ -34,6 +34,11 @@ public interface ICajaService
     /// Historial para exportación Excel, opcionalmente filtrado por rango de <see cref="CierreCaja.FechaCierre"/> (fecha calendario).
     /// </summary>
     Task<List<CierreCaja>> ObtenerHistorialParaExportAsync(DateTime? desde, DateTime? hasta);
+
+    /// <summary>
+    /// Un cierre por id (incluye usuario), o null si no existe.
+    /// </summary>
+    Task<CierreCaja?> ObtenerCierrePorIdAsync(int id);
 }
 
 public class CajaEstadoResponse

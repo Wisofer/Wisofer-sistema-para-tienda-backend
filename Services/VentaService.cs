@@ -94,7 +94,17 @@ public class VentaService : IVentaService
             venta.DetalleVentas.Where(d => !d.Anulado).Sum(d => d.Total),
             2,
             MidpointRounding.AwayFromZero);
-        var descuento = Math.Round(request.DescuentoMonto ?? 0m, 2, MidpointRounding.AwayFromZero);
+
+        decimal descuento;
+        if (request.DescuentoPorcentaje.HasValue)
+        {
+            var pct = Math.Round(request.DescuentoPorcentaje.Value, 4, MidpointRounding.AwayFromZero);
+            descuento = Math.Round(subtotalVenta * (pct / 100m), 2, MidpointRounding.AwayFromZero);
+        }
+        else
+        {
+            descuento = Math.Round(request.DescuentoMonto ?? 0m, 2, MidpointRounding.AwayFromZero);
+        }
 
         if (descuento > subtotalVenta + ToleranciaMonto)
             throw new Exception($"El descuento no puede superar el total de la venta.");
@@ -319,7 +329,14 @@ public class VentaService : IVentaService
     {
         if (request.VentaId <= 0) throw new Exception("Venta inválida.");
         if (string.IsNullOrWhiteSpace(request.TipoPago)) throw new Exception("Tipo de pago es requerido.");
-        if (request.DescuentoMonto < 0) throw new Exception("El descuento no puede ser negativo.");
+        if (request.DescuentoPorcentaje.HasValue)
+        {
+            var p = request.DescuentoPorcentaje.Value;
+            if (p < 0 || p > 100)
+                throw new Exception("descuentoPorcentaje debe estar entre 0 y 100.");
+        }
+        else if ((request.DescuentoMonto ?? 0) < 0)
+            throw new Exception("El descuento no puede ser negativo.");
     }
 
     private void ValidarCajaAbierta()

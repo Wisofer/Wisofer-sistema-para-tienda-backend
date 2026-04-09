@@ -127,17 +127,64 @@ public class CajaApiController : BaseApiController
                 {
                     c.Id,
                     c.FechaCierre,
+                    c.FechaHoraCierre,
                     c.Estado,
                     c.MontoInicial,
                     c.TotalGeneral,
+                    c.TotalEfectivo,
+                    c.TotalTarjeta,
                     c.MontoEsperado,
                     c.MontoReal,
+                    c.Diferencia,
                     Usuario = c.Usuario != null ? c.Usuario.NombreCompleto : null
                 }).ToList(),
                 Page = result.Page,
                 PageSize = result.PageSize,
                 TotalItems = result.TotalItems,
                 TotalPages = result.TotalPages
+            });
+        }
+        catch (Exception ex)
+        {
+            return FailResponse(ex.Message, StatusCodes.Status400BadRequest);
+        }
+    }
+
+    /// <summary>Detalle completo de un cierre (modal caja / integraciones). Alias: <c>GET historial/{id}</c>.</summary>
+    [HttpGet("cierres/{id:int}")]
+    public Task<IActionResult> DetalleCierrePorCierres(int id) => DetalleCierreCore(id);
+
+    [HttpGet("historial/{id:int}")]
+    public Task<IActionResult> DetalleCierrePorHistorial(int id) => DetalleCierreCore(id);
+
+    private async Task<IActionResult> DetalleCierreCore(int id)
+    {
+        try
+        {
+            var c = await _cajaService.ObtenerCierrePorIdAsync(id);
+            if (c == null)
+                return FailResponse("Cierre no encontrado.", StatusCodes.Status404NotFound);
+
+            return OkResponse(new
+            {
+                c.Id,
+                c.FechaCierre,
+                c.FechaHoraCierre,
+                c.Estado,
+                c.MontoInicial,
+                c.TotalEfectivo,
+                c.TotalTarjeta,
+                c.TotalTransferencia,
+                c.TotalCordobas,
+                c.TotalDolares,
+                c.TotalGeneral,
+                c.TotalOrdenes,
+                c.TotalPagos,
+                c.MontoEsperado,
+                c.MontoReal,
+                c.Diferencia,
+                c.Observaciones,
+                Usuario = c.Usuario != null ? c.Usuario.NombreCompleto : null
             });
         }
         catch (Exception ex)
