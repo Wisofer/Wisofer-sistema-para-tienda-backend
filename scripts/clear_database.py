@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Vacía todas las tablas de datos de la aplicación (PostgreSQL).
+Vacía las tablas de datos de la aplicación (PostgreSQL).
 No borra __EFMigrationsHistory (el esquema sigue aplicado).
+No borra la tabla **Usuarios** (cuentas se conservan).
 
 Uso:
   pip install psycopg2-binary
@@ -27,7 +28,8 @@ except ImportError:
     print("Instala dependencias: pip install psycopg2-binary", file=sys.stderr)
     sys.exit(1)
 
-# Tablas de datos (mismo orden no importa con CASCADE en un solo TRUNCATE)
+# Tablas de datos (mismo orden no importa con CASCADE en un solo TRUNCATE).
+# "Usuarios" se excluye a propósito.
 TABLES = [
     '"DetalleVentas"',
     '"Pagos"',
@@ -43,7 +45,6 @@ TABLES = [
     '"Configuraciones"',
     '"RefreshTokens"',
     '"PlantillasMensajeWhatsApp"',
-    '"Usuarios"',
 ]
 
 
@@ -73,7 +74,8 @@ def main() -> None:
     dsn = load_dsn()
 
     if not args.yes:
-        print("Se borrarán TODOS los datos de negocio (ventas, productos, usuarios, etc.).")
+        print("Se borrarán los datos de negocio (ventas, productos, categorías, caja, etc.).")
+        print("Los usuarios NO se borran.")
         print("La tabla __EFMigrationsHistory no se toca.")
         r = input("Escribe SI en mayúsculas para continuar: ")
         if r != "SI":
@@ -87,8 +89,8 @@ def main() -> None:
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
-        print("Listo: base de datos vaciada.")
-        print("Al arrancar la API, InicializarUsuarioAdmin vuelve a crear admin/admin y datos mínimos.")
+        print("Listo: tablas vaciadas (usuarios conservados).")
+        print("Si hace falta, vuelve a cargar categorías/productos y configuración.")
     finally:
         conn.close()
 

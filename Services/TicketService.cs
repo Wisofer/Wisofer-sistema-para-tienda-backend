@@ -11,6 +11,11 @@ namespace SistemaDeTienda.Services;
 
 public class TicketService : ITicketService
 {
+    /// <summary>Datos fiscales del emisor en el ticket (recibo térmico).</summary>
+    private const string TicketRuc = "2812101890003J";
+    private const string TicketDireccion =
+        "Costado norte Iglesia San Juan en la estación 25 varas al norte.";
+
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _env;
 
@@ -49,7 +54,7 @@ public class TicketService : ITicketService
         var metodo = (pago?.TipoPago ?? venta.MetodoPago ?? "EFECTIVO").ToUpperInvariant();
         var fechaPie = pago?.FechaPago ?? venta.Fecha;
 
-        var logoPath = Path.Combine(_env.WebRootPath ?? "", "images", "logo.png");
+        var logoPath = Path.Combine(_env.WebRootPath ?? "", "images", "Recurso 9LaFeria_Colectivo.png");
         var tieneLogo = File.Exists(logoPath);
 
         const string fuenteTicket = Fonts.Courier;
@@ -74,6 +79,9 @@ public class TicketService : ITicketService
                     {
                         col.Item().AlignCenter().Text("SISTEMA DE TIENDA").Bold().FontSize(11).FontFamily(fuenteTicket);
                     }
+
+                    col.Item().PaddingTop(3).AlignCenter().Text($"RUC: {TicketRuc}").FontSize(7).FontFamily(fuenteTicket);
+                    col.Item().PaddingTop(2).AlignCenter().Text(TicketDireccion).FontSize(7).FontFamily(fuenteTicket);
 
                     col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
@@ -143,7 +151,7 @@ public class TicketService : ITicketService
                     col.Item().PaddingVertical(4).LineHorizontal(0.5f).LineColor(Colors.Black);
 
                     // === Pie ===
-                    col.Item().AlignCenter().Text("¡Gracias por su preferencia!").Bold().FontSize(8);
+                    col.Item().AlignCenter().Text("Gracias por su apoyo al talento local!").Bold().FontSize(8);
                     col.Item().PaddingTop(4).AlignCenter().Text($"{fechaPie:dd/MM/yyyy HH:mm:ss}").FontSize(7);
                 });
             });

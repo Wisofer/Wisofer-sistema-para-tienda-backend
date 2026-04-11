@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Bjlp/3LWV1NdpLyOE9+c91yLhs2O8xoaNmPvlHFilqc=",
+  "Hash": "z2ROkyG8U9edTUpMchIvNvv2kdo3rGBxdklAeBpdaZc=",
   "Source": "SistemaDeTienda",
   "BasePath": "_content/SistemaDeTienda",
   "Mode": "Default",
@@ -162,6 +162,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/images/logo.png"
+    },
+    {
+      "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/Recurso 9LaFeria_Colectivo.png",
+      "SourceId": "SistemaDeTienda",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/",
+      "BasePath": "_content/SistemaDeTienda",
+      "RelativePath": "images/Recurso 9LaFeria_Colectivo#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "0ciwmvou61",
+      "Integrity": "0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/images/Recurso 9LaFeria_Colectivo.png"
     },
     {
       "Identity": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/js/caja/index.js",
@@ -729,6 +750,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu+JrZg="
+        }
+      ]
+    },
+    {
+      "Route": "images/Recurso 9LaFeria_Colectivo.0ciwmvou61.png",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/Recurso 9LaFeria_Colectivo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "118869"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 11 Apr 2026 20:38:51 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "0ciwmvou61"
+        },
+        {
+          "Name": "label",
+          "Value": "images/Recurso 9LaFeria_Colectivo.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs="
+        }
+      ]
+    },
+    {
+      "Route": "images/Recurso 9LaFeria_Colectivo.png",
+      "AssetFile": "/home/william/Documentos/aplicaciones/sistema de tienda backend/wwwroot/images/Recurso 9LaFeria_Colectivo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "118869"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 11 Apr 2026 20:38:51 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs="
         }
       ]
     },

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 Inserta las categorías de producto por nombre (Id autogenerado por PostgreSQL).
+Lista alineada con la hoja «codigo de familia» del Excel del cliente; fuente paralela:
+scripts/familias_cliente.json (23 familias, códigos 16–38).
+
 Si el nombre ya existe, solo asegura Activo = true.
 
 Uso:
@@ -53,7 +56,7 @@ def main() -> None:
     try:
         with conn.cursor() as cur:
             cur.execute(sql)
-        print("Listo: 14 categorías (nuevas o actualizadas por nombre; Id asignado por la BD).")
+        print("Listo: 23 categorías / familias (nuevas o actualizadas por nombre; Id asignado por la BD).")
     finally:
         conn.close()
 

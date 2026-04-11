@@ -36,6 +36,18 @@
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"y6w1c4yadd"},{"Name":"integrity","Value":"sha256-OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu\u002BJrZg="},{"Name":"label","Value":"_content/SistemaDeTienda/images/logo.png"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"71639"},{"Name":"Content-Type","Value":"image/png"},{"Name":"ETag","Value":"\u0022OhX/vwU4e1Qqtgdb15jcaAuv7GyjY/GZWCUXgu\u002BJrZg=\u0022"},{"Name":"Last-Modified","Value":"Mon, 06 Apr 2026 00:09:24 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/SistemaDeTienda/images/Recurso 9LaFeria_Colectivo.0ciwmvou61.png">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\Recurso 9LaFeria_Colectivo.png'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"0ciwmvou61"},{"Name":"integrity","Value":"sha256-0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs="},{"Name":"label","Value":"_content/SistemaDeTienda/images/Recurso 9LaFeria_Colectivo.png"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"118869"},{"Name":"Content-Type","Value":"image/png"},{"Name":"ETag","Value":"\u00220NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs=\u0022"},{"Name":"Last-Modified","Value":"Sat, 11 Apr 2026 20:38:51 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/SistemaDeTienda/images/Recurso 9LaFeria_Colectivo.png">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\Recurso 9LaFeria_Colectivo.png'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-0NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=3600, must-revalidate"},{"Name":"Content-Length","Value":"118869"},{"Name":"Content-Type","Value":"image/png"},{"Name":"ETag","Value":"\u00220NbTWk0uoago4U8hGUAgIEwo3ghdefI62DdL6I7vaQs=\u0022"},{"Name":"Last-Modified","Value":"Sat, 11 Apr 2026 20:38:51 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/SistemaDeTienda/js/caja/index.i0e3cv467i.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\caja\index.js'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
