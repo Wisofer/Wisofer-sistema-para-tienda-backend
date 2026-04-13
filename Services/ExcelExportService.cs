@@ -178,7 +178,12 @@ public class ExcelExportService
     public byte[] ExportarTopProductos(IEnumerable<ProductoTopReporte> items)
     {
         using var package = new ExcelPackage();
-        string[] headers = { "Ranking", "Categoría", "Producto", "Cant. Vendida", "Venta Total (C$)" };
+        // Columna 6: resumen legible en la misma hoja (método · moneda · uds · C$ por cada forma de cobro).
+        string[] headers =
+        {
+            "Ranking", "Categoría", "Producto", "Cant. Vendida", "Venta Total (C$)",
+            "Formas de cobro (método · moneda · uds · monto C$)"
+        };
         var worksheet = PrepareSheet(package, "Top Productos", headers, HeaderBlue);
 
         int row = 2;
@@ -190,15 +195,17 @@ public class ExcelExportService
             worksheet.Cells[row, 3].Value = item.Producto ?? "";
             worksheet.Cells[row, 4].Value = item.Cantidad;
             SetCellMoney(worksheet, row, 5, item.Venta);
+            worksheet.Cells[row, 6].Value = FormatearDesgloseTopProductos(item);
+            worksheet.Cells[row, 6].Style.WrapText = true;
             row++;
         }
 
         if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 4, 5 });
         ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Top de Productos Más Vendidos");
 
-        // Segunda hoja: desglose por método y moneda (mismo top de productos)
+        // Segunda hoja: una fila por producto × método × moneda (exportable / pivot)
         string[] headersDes = { "Ranking", "Categoría", "Producto", "Método pago", "Moneda", "Cant. unidades", "Monto (C$)" };
-        var wsDes = PrepareSheet(package, "Por forma de pago", headersDes, HeaderIndigo);
+        var wsDes = PrepareSheet(package, "Detalle por forma de pago", headersDes, HeaderIndigo);
         int rd = 2;
         rank = 1;
         foreach (var item in items)
@@ -305,6 +312,20 @@ public class ExcelExportService
     {
         sheet.Cells[row, col].Value = Convert.ToDecimal(val ?? 0m);
         sheet.Cells[row, col].Style.Numberformat.Format = "#,##0.00";
+    }
+
+    /// <summary>Texto en una celda: cómo se vendió el producto por cada método/moneda (misma info que la API).</summary>
+    private static string FormatearDesgloseTopProductos(ProductoTopReporte item)
+    {
+        if (item.DesglosePorFormaPago == null || item.DesglosePorFormaPago.Count == 0)
+            return "—";
+
+        var partes = item.DesglosePorFormaPago.Select(d =>
+        {
+            var mon = string.IsNullOrWhiteSpace(d.Moneda) ? "N/D" : d.Moneda;
+            return $"{d.MetodoPago} · {mon}: {d.CantidadUnidades} uds, C$ {d.MontoCordobas:N2}";
+        });
+        return string.Join("  |  ", partes);
     }
 
     private static object? GetValueSafe(object item, string propName)
