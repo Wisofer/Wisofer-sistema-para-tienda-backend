@@ -22,3 +22,6 @@ obj/
 __pycache__/
 *.py[cod]
 *.pyc
+
+## QA automation (reportes generados al ejecutar)
+qa/automation/artifacts/

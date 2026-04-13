@@ -193,6 +193,21 @@ public class ProductoTopReporte
     public string Producto { get; set; } = string.Empty;
     public int Cantidad { get; set; }
     public decimal Venta { get; set; }
+
+    /// <summary>
+    /// Desglose por forma de cobro del ticket (método + moneda). Un producto puede tener varias filas
+    /// si se vendió con efectivo, tarjeta, etc. Cantidades y montos son la parte del producto en cada ticket.
+    /// </summary>
+    public List<ProductoTopDesglosePago> DesglosePorFormaPago { get; set; } = new();
+}
+
+/// <summary>Parte del top producto atribuible a un método/moneda de cobro.</summary>
+public class ProductoTopDesglosePago
+{
+    public string MetodoPago { get; set; } = "";
+    public string? Moneda { get; set; }
+    public int CantidadUnidades { get; set; }
+    public decimal MontoCordobas { get; set; }
 }
 
 /// <summary>Ventas cobradas agrupadas por el usuario que registró el ticket (POS).</summary>

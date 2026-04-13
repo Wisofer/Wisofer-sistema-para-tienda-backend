@@ -175,7 +175,7 @@ public class ExcelExportService
         return package.GetAsByteArray();
     }
 
-    public byte[] ExportarTopProductos(IEnumerable<dynamic> items)
+    public byte[] ExportarTopProductos(IEnumerable<ProductoTopReporte> items)
     {
         using var package = new ExcelPackage();
         string[] headers = { "Ranking", "Categoría", "Producto", "Cant. Vendida", "Venta Total (C$)" };
@@ -188,13 +188,55 @@ public class ExcelExportService
             worksheet.Cells[row, 1].Value = rank++;
             worksheet.Cells[row, 2].Value = item.Categoria ?? "";
             worksheet.Cells[row, 3].Value = item.Producto ?? "";
-            worksheet.Cells[row, 4].Value = item.Cantidad ?? 0;
+            worksheet.Cells[row, 4].Value = item.Cantidad;
             SetCellMoney(worksheet, row, 5, item.Venta);
             row++;
         }
 
         if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 4, 5 });
         ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Top de Productos Más Vendidos");
+
+        // Segunda hoja: desglose por método y moneda (mismo top de productos)
+        string[] headersDes = { "Ranking", "Categoría", "Producto", "Método pago", "Moneda", "Cant. unidades", "Monto (C$)" };
+        var wsDes = PrepareSheet(package, "Por forma de pago", headersDes, HeaderIndigo);
+        int rd = 2;
+        rank = 1;
+        foreach (var item in items)
+        {
+            var des = item.DesglosePorFormaPago;
+            if (des == null || des.Count == 0)
+            {
+                wsDes.Cells[rd, 1].Value = rank;
+                wsDes.Cells[rd, 2].Value = item.Categoria;
+                wsDes.Cells[rd, 3].Value = item.Producto;
+                wsDes.Cells[rd, 4].Value = "—";
+                wsDes.Cells[rd, 5].Value = "—";
+                wsDes.Cells[rd, 6].Value = 0;
+                SetCellMoney(wsDes, rd, 7, 0m);
+                rd++;
+                rank++;
+                continue;
+            }
+
+            foreach (var d in des)
+            {
+                wsDes.Cells[rd, 1].Value = rank;
+                wsDes.Cells[rd, 2].Value = item.Categoria;
+                wsDes.Cells[rd, 3].Value = item.Producto;
+                wsDes.Cells[rd, 4].Value = d.MetodoPago;
+                wsDes.Cells[rd, 5].Value = d.Moneda ?? "—";
+                wsDes.Cells[rd, 6].Value = d.CantidadUnidades;
+                SetCellMoney(wsDes, rd, 7, d.MontoCordobas);
+                rd++;
+            }
+
+            rank++;
+        }
+
+        if (rd > 2)
+            AddTotalRow(wsDes, 2, rd - 1, new[] { 6, 7 });
+        ApplyExpertStyles(wsDes, wsDes.Dimension!.End.Row, headersDes.Length, "Desglose por método y moneda de cobro");
+
         return package.GetAsByteArray();
     }
 

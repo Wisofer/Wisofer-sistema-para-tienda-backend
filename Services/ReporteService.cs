@@ -258,27 +258,77 @@ public class ReporteService : IReporteService
         var (fDesde, fHasta) = ResolverRango(desde, hasta, DateTime.Today.AddDays(-30));
         var limit = Math.Min(Math.Max(top, 1), 100);
 
-        return await _context.DetalleVentas.AsNoTracking()
+        var lineas = await _context.DetalleVentas.AsNoTracking()
             .Include(i => i.Venta)
             .Include(i => i.Producto).ThenInclude(p => p!.CategoriaProducto)
             .Where(i => !i.Anulado &&
                         (i.Venta.Estado == SD.EstadoVentaPagado || i.Venta.Estado == SD.EstadoVentaCompletada) &&
                         i.Venta.Fecha >= fDesde && i.Venta.Fecha <= fHasta)
-            .GroupBy(i => i.ProductoId)
-            .Select(g => new ProductoTopReporte
+            .ToListAsync();
+
+        if (lineas.Count == 0)
+            return new List<ProductoTopReporte>();
+
+        var ventaIds = lineas.Select(l => l.VentaId).Distinct().ToHashSet();
+        var pagosBatch = await _context.Pagos
+            .AsNoTracking()
+            .Include(p => p.PagoVentas)
+            .Where(p => (p.VentaId.HasValue && ventaIds.Contains(p.VentaId.Value))
+                || p.PagoVentas.Any(pv => ventaIds.Contains(pv.VentaId)))
+            .ToListAsync();
+
+        var enriched = lineas.Select(l => (
+            ProductoId: l.ProductoId,
+            Categoria: l.Producto?.CategoriaProducto?.Nombre ?? "",
+            Nombre: l.Producto?.Nombre ?? "Producto eliminado",
+            Cantidad: l.Cantidad,
+            Total: l.Total,
+            Metodo: l.Venta?.MetodoPago ?? "",
+            Moneda: FormatearMonedaEtiqueta(MonedaDelCobro(l.VentaId, pagosBatch))
+        )).ToList();
+
+        var topProductIds = enriched
+            .GroupBy(x => x.ProductoId)
+            .Select(g => new
             {
                 ProductoId = g.Key,
-                Producto = g.Select(x => x.Producto != null ? x.Producto.Nombre : "Producto eliminado").First(),
-                Categoria = g.Select(x =>
-                    x.Producto != null && x.Producto.CategoriaProducto != null
-                        ? x.Producto.CategoriaProducto.Nombre
-                        : "").First(),
                 Cantidad = g.Sum(x => x.Cantidad),
-                Venta = g.Sum(x => x.Total)
+                Venta = g.Sum(x => x.Total),
+                Categoria = g.First().Categoria,
+                Producto = g.First().Nombre
             })
             .OrderByDescending(x => x.Cantidad)
             .Take(limit)
-            .ToListAsync();
+            .ToList();
+
+        var result = new List<ProductoTopReporte>();
+        foreach (var p in topProductIds)
+        {
+            var filas = enriched.Where(x => x.ProductoId == p.ProductoId).ToList();
+            var desglose = filas
+                .GroupBy(x => (x.Metodo, x.Moneda))
+                .Select(g => new ProductoTopDesglosePago
+                {
+                    MetodoPago = g.Key.Metodo,
+                    Moneda = g.Key.Moneda,
+                    CantidadUnidades = g.Sum(x => x.Cantidad),
+                    MontoCordobas = Math.Round(g.Sum(x => x.Total), 2, MidpointRounding.AwayFromZero)
+                })
+                .OrderByDescending(x => x.MontoCordobas)
+                .ToList();
+
+            result.Add(new ProductoTopReporte
+            {
+                ProductoId = p.ProductoId,
+                Categoria = p.Categoria,
+                Producto = p.Producto,
+                Cantidad = p.Cantidad,
+                Venta = Math.Round(p.Venta, 2, MidpointRounding.AwayFromZero),
+                DesglosePorFormaPago = desglose
+            });
+        }
+
+        return result;
     }
 
     public byte[] GenerarExcelVentas(DateTime desde, DateTime hasta, List<VentaDetalleReporte> ventas)
@@ -310,13 +360,7 @@ public class ReporteService : IReporteService
 
     public byte[] GenerarExcelTopProductos(DateTime desde, DateTime hasta, List<ProductoTopReporte> items)
     {
-        return _excelExportService.ExportarTopProductos(items.Select(x => new
-        {
-            x.Categoria,
-            x.Producto,
-            Cantidad = x.Cantidad,
-            Venta = x.Venta
-        }).ToList());
+        return _excelExportService.ExportarTopProductos(items);
     }
 
     public byte[] GenerarExcelVentasPorVendedor(DateTime desde, DateTime hasta, List<VentaPorVendedorReporte> items)
