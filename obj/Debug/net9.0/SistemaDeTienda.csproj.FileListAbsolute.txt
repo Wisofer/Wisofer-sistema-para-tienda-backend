@@ -172,3 +172,4 @@
 /home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/SistemaDeTienda.genruntimeconfig.cache
 /home/william/Documentos/aplicaciones/sistema de tienda backend/obj/Debug/net9.0/ref/SistemaDeTienda.dll
 /home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/scripts/familias_cliente.json
+/home/william/Documentos/aplicaciones/sistema de tienda backend/bin/Debug/net9.0/qa/automation/artifacts/last_report.json
