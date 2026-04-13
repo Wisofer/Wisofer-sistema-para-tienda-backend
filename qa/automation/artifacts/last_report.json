@@ -1,0 +1,360 @@
+{
+  "baseUrl": "https://sistema-para-tienda.cowib.es",
+  "timestampUtc": "2026-04-13T20:36:47.928365+00:00",
+  "summary": {
+    "total": 38,
+    "passed": 38,
+    "failed": 0
+  },
+  "context": {
+    "categoriaId": 27,
+    "productoId": 1071,
+    "clienteId": 4,
+    "usuarioId": 7,
+    "ventaId": 4
+  },
+  "tests": [
+    {
+      "name": "Login correcto",
+      "ok": true,
+      "ms": 1777.3,
+      "detail": "token obtenido (Login exitoso)",
+      "error": "",
+      "recommendation": "",
+      "module": "auth"
+    },
+    {
+      "name": "GET /auth/me (sesión)",
+      "ok": true,
+      "ms": 86.27,
+      "detail": "usuario OK, rol=Administrador",
+      "error": "",
+      "recommendation": "",
+      "module": "auth"
+    },
+    {
+      "name": "Login incorrecto (rechazo)",
+      "ok": true,
+      "ms": 328.65,
+      "detail": "credenciales inválidas rechazadas",
+      "error": "",
+      "recommendation": "",
+      "module": "auth"
+    },
+    {
+      "name": "Listado de categorías",
+      "ok": true,
+      "ms": 188.0,
+      "detail": "23 categorías",
+      "error": "",
+      "recommendation": "",
+      "module": "categorias"
+    },
+    {
+      "name": "Crear categoría (QA)",
+      "ok": true,
+      "ms": 121.08,
+      "detail": "categoría id=27",
+      "error": "",
+      "recommendation": "",
+      "module": "categorias"
+    },
+    {
+      "name": "Editar categoría (QA)",
+      "ok": true,
+      "ms": 136.3,
+      "detail": "actualizada",
+      "error": "",
+      "recommendation": "",
+      "module": "categorias"
+    },
+    {
+      "name": "Estado Activa/Inactiva (QA)",
+      "ok": true,
+      "ms": 274.69,
+      "detail": "Activa/Inactiva probado",
+      "error": "",
+      "recommendation": "",
+      "module": "categorias"
+    },
+    {
+      "name": "Listado de productos (paginado)",
+      "ok": true,
+      "ms": 122.74,
+      "detail": "página con 10 ítems (muestra)",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "Crear producto (QA)",
+      "ok": true,
+      "ms": 127.27,
+      "detail": "producto id=1071 código=QA-PROD-1776112599",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "Conteo por categoría (filtro)",
+      "ok": true,
+      "ms": 124.8,
+      "detail": "productos en categoría QA: totalItems=1",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "Obtener producto por id",
+      "ok": true,
+      "ms": 103.36,
+      "detail": "stockTotal=20",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "Editar producto (QA)",
+      "ok": true,
+      "ms": 137.51,
+      "detail": "producto actualizado",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "ENTRADA de inventario",
+      "ok": true,
+      "ms": 139.0,
+      "detail": "entrada OK stockNuevo=25",
+      "error": "",
+      "recommendation": "",
+      "module": "inventario"
+    },
+    {
+      "name": "SALIDA de inventario",
+      "ok": true,
+      "ms": 138.5,
+      "detail": "salida OK stockNuevo=23",
+      "error": "",
+      "recommendation": "",
+      "module": "inventario"
+    },
+    {
+      "name": "AJUSTE de inventario",
+      "ok": true,
+      "ms": 243.79,
+      "detail": "ajuste a físico 26 → stockNuevo=26",
+      "error": "",
+      "recommendation": "",
+      "module": "inventario"
+    },
+    {
+      "name": "Listado movimientos (por producto)",
+      "ok": true,
+      "ms": 121.43,
+      "detail": "3 movimientos tipos={'Salida', 'Entrada', 'Ajuste'}",
+      "error": "",
+      "recommendation": "",
+      "module": "movimientos"
+    },
+    {
+      "name": "Estado de caja",
+      "ok": true,
+      "ms": 105.05,
+      "detail": "caja abierta=True",
+      "error": "",
+      "recommendation": "",
+      "module": "caja"
+    },
+    {
+      "name": "Apertura de caja (si estaba cerrada)",
+      "ok": true,
+      "ms": 0.0,
+      "detail": "ya había caja abierta; no se abre otra",
+      "error": "",
+      "recommendation": "",
+      "module": "caja"
+    },
+    {
+      "name": "Crear venta POS (descuenta stock)",
+      "ok": true,
+      "ms": 576.37,
+      "detail": "venta id=4 total=100.0 stock tras crear=25",
+      "error": "",
+      "recommendation": "",
+      "module": "ventas"
+    },
+    {
+      "name": "Procesar pago (caja)",
+      "ok": true,
+      "ms": 169.25,
+      "detail": "pago OK totalNeto=100.0 vuelto=4900.0",
+      "error": "",
+      "recommendation": "",
+      "module": "ventas"
+    },
+    {
+      "name": "Crear cliente",
+      "ok": true,
+      "ms": 121.03,
+      "detail": "cliente id=4",
+      "error": "",
+      "recommendation": "",
+      "module": "clientes"
+    },
+    {
+      "name": "Editar cliente",
+      "ok": true,
+      "ms": 120.88,
+      "detail": "cliente actualizado",
+      "error": "",
+      "recommendation": "",
+      "module": "clientes"
+    },
+    {
+      "name": "Eliminar cliente (Admin)",
+      "ok": true,
+      "ms": 137.74,
+      "detail": "cliente eliminado",
+      "error": "",
+      "recommendation": "",
+      "module": "clientes"
+    },
+    {
+      "name": "Crear usuario (rol Normal)",
+      "ok": true,
+      "ms": 120.56,
+      "detail": "usuario id=7 rol=Normal",
+      "error": "",
+      "recommendation": "",
+      "module": "usuarios"
+    },
+    {
+      "name": "Listado usuarios / roles visibles",
+      "ok": true,
+      "ms": 123.23,
+      "detail": "4 usuarios roles={'Cajero', 'Administrador', 'Normal'}",
+      "error": "",
+      "recommendation": "",
+      "module": "usuarios"
+    },
+    {
+      "name": "Editar usuario (rol Cajero)",
+      "ok": true,
+      "ms": 136.78,
+      "detail": "rol actualizado a Cajero",
+      "error": "",
+      "recommendation": "",
+      "module": "usuarios"
+    },
+    {
+      "name": "Eliminar usuario",
+      "ok": true,
+      "ms": 133.31,
+      "detail": "usuario eliminado",
+      "error": "",
+      "recommendation": "",
+      "module": "usuarios"
+    },
+    {
+      "name": "Resumen de ventas (JSON)",
+      "ok": true,
+      "ms": 131.39,
+      "detail": "claves: ['desde', 'hasta', 'totalVentas', 'totalTickets', 'promedioTicket', 'porDia']",
+      "error": "",
+      "recommendation": "",
+      "module": "reportes"
+    },
+    {
+      "name": "Exportar resumen ventas (Excel)",
+      "ok": true,
+      "ms": 226.05,
+      "detail": "Excel reporte ventas: columnas detectadas: 6",
+      "error": "",
+      "recommendation": "",
+      "module": "reportes"
+    },
+    {
+      "name": "Exportar inventario productos (Excel)",
+      "ok": true,
+      "ms": 561.83,
+      "detail": "export productos: columnas detectadas: 8",
+      "error": "",
+      "recommendation": "",
+      "module": "export"
+    },
+    {
+      "name": "Exportar movimientos inventario (Excel)",
+      "ok": true,
+      "ms": 157.05,
+      "detail": "export movimientos: columnas detectadas: 13",
+      "error": "",
+      "recommendation": "",
+      "module": "export"
+    },
+    {
+      "name": "Listar configuraciones (Admin)",
+      "ok": true,
+      "ms": 101.28,
+      "detail": "1 parámetros",
+      "error": "",
+      "recommendation": "",
+      "module": "config"
+    },
+    {
+      "name": "Obtener tipo de cambio",
+      "ok": true,
+      "ms": 104.63,
+      "detail": "tipo cambio=36.6",
+      "error": "",
+      "recommendation": "",
+      "module": "config"
+    },
+    {
+      "name": "Actualizar tipo de cambio (idempotente)",
+      "ok": true,
+      "ms": 126.01,
+      "detail": "PUT idempotente (mismo valor)",
+      "error": "",
+      "recommendation": "",
+      "module": "config"
+    },
+    {
+      "name": "Eliminar producto (desactivar)",
+      "ok": true,
+      "ms": 123.01,
+      "detail": "producto desactivado (soft delete)",
+      "error": "",
+      "recommendation": "",
+      "module": "productos"
+    },
+    {
+      "name": "Eliminar categoría QA (tras reasignar)",
+      "ok": true,
+      "ms": 259.9,
+      "detail": "categoría QA eliminada",
+      "error": "",
+      "recommendation": "",
+      "module": "categorias"
+    },
+    {
+      "name": "Logout",
+      "ok": true,
+      "ms": 85.06,
+      "detail": "Sesión cerrada y tokens revocados",
+      "error": "",
+      "recommendation": "",
+      "module": "auth"
+    },
+    {
+      "name": "GET página principal (no 500)",
+      "ok": true,
+      "ms": 383.21,
+      "detail": "GET https://sistema-para-tienda.cowib.es → 404",
+      "error": "",
+      "recommendation": "",
+      "module": "salud"
+    }
+  ]
+}
