@@ -5,10 +5,11 @@ from __future__ import annotations
 
 import time
 import zipfile
+from datetime import date
+from io import BytesIO
+from typing import Any, Callable, List, Optional, Tuple
 
 import requests
-from io import BytesIO
-from typing import Any, Callable, List, Optional
 
 from api_client import ApiClient
 from config import MAX_RESPONSE_TIME_WARN_MS
@@ -57,6 +58,55 @@ def _try_xlsx_structure(data: bytes) -> tuple[bool, str]:
         return True, "openpyxl no instalado; solo validación ZIP"
     except Exception as e:
         return False, str(e)
+
+
+# Coincide con SistemaDeTienda.Utils.SD
+MONEDA_CORDOBAS = "Cordobas"
+MONEDA_DOLARES = "Dolares"
+
+
+def _fetch_tipo_cambio(client: ApiClient) -> float:
+    _, _, ok, data, _ = client.request("GET", "/configuraciones/tipo-cambio")
+    if not ok or not data:
+        return 36.5
+    raw = (data or {}).get("tipoCambioDolar") or (data or {}).get("TipoCambioDolar")
+    try:
+        return float(str(raw).replace(",", "."))
+    except (TypeError, ValueError):
+        return 36.5
+
+
+def _crear_venta_pos(client: ApiClient, product_id: int) -> Tuple[bool, str, Optional[int], Optional[float]]:
+    body = {"items": [{"productoId": product_id, "productoVarianteId": None, "cantidad": 1}], "observaciones": "QA venta formas de pago"}
+    r, ms, ok, data, msg = client.request("POST", "/pos/ventas", json_body=body)
+    if not ok:
+        return False, msg, None, None
+    vid = (data or {}).get("id") or (data or {}).get("Id")
+    total = (data or {}).get("total") or (data or {}).get("Total")
+    return True, "", vid, float(total) if total is not None else None
+
+
+def _procesar_pago(
+    client: ApiClient,
+    venta_id: int,
+    tipo_pago: str,
+    moneda: str,
+    monto_pagado: float,
+    banco: Optional[str] = None,
+) -> Tuple[bool, str]:
+    body: dict[str, Any] = {
+        "ventaId": venta_id,
+        "tipoPago": tipo_pago,
+        "montoPagado": monto_pagado,
+        "moneda": moneda,
+    }
+    if banco:
+        body["banco"] = banco
+    r, ms, ok, data, msg = client.request("POST", "/ventas/procesar-pago", json_body=body)
+    if not ok:
+        return False, msg or "pago falló"
+    neto = (data or {}).get("totalNetoCordobas") or (data or {}).get("TotalNetoCordobas")
+    return True, f"neto={neto}"
 
 
 def _run(
@@ -350,6 +400,59 @@ def run_api_tests(client: ApiClient) -> tuple[List[TestResult], QaContext]:
 
     results.append(_run("movimientos", "Listado movimientos (por producto)", t_mov_list))
 
+    def t_inv_entrada_extra() -> tuple[bool, str, str]:
+        if not product_id:
+            return False, "sin producto", ""
+        body = {
+            "productoId": product_id,
+            "productoVarianteId": None,
+            "cantidad": 3,
+            "costoUnitario": 12.5,
+            "proveedorId": None,
+            "numeroReferencia": f"QA-ENT2-{ts}",
+            "observaciones": "QA segunda entrada",
+        }
+        r, ms, ok, data, msg = client.request("POST", "/inventario/entrada", json_body=body)
+        if not ok:
+            return False, msg, ""
+        sn = (data or {}).get("stockNuevo") or (data or {}).get("StockNuevo")
+        return True, f"entrada +3 unidades stockNuevo={sn}", _slow_rec(ms)
+
+    results.append(_run("inventario", "ENTRADA extra de stock (+3)", t_inv_entrada_extra))
+
+    def t_inv_salida_extra() -> tuple[bool, str, str]:
+        if not product_id:
+            return False, "sin producto", ""
+        body = {
+            "productoId": product_id,
+            "productoVarianteId": None,
+            "cantidad": 1,
+            "subtipo": "Salida QA extra",
+            "observaciones": "QA salida manual",
+        }
+        r, ms, ok, data, msg = client.request("POST", "/inventario/salida", json_body=body)
+        if not ok:
+            return False, msg, ""
+        sn = (data or {}).get("stockNuevo") or (data or {}).get("StockNuevo")
+        return True, f"salida -1 stockNuevo={sn}", _slow_rec(ms)
+
+    results.append(_run("inventario", "SALIDA extra de stock (-1)", t_inv_salida_extra))
+
+    def t_mov_filtrar_tipo_entrada() -> tuple[bool, str, str]:
+        if not product_id:
+            return False, "sin producto", ""
+        r, ms, ok, data, msg = client.request(
+            "GET",
+            "/inventario/movimientos",
+            params={"productoId": product_id, "tipo": "Entrada", "page": 1, "pageSize": 20},
+        )
+        if not ok:
+            return False, msg, ""
+        items = _get_paged_items(data)
+        return True, f"filtrado Entrada: {len(items)} filas", _slow_rec(ms)
+
+    results.append(_run("movimientos", "Movimientos filtrados por tipo (Entrada)", t_mov_filtrar_tipo_entrada))
+
     # —— Caja + Venta ——
     caja_abierta = False
 
@@ -378,43 +481,232 @@ def run_api_tests(client: ApiClient) -> tuple[List[TestResult], QaContext]:
     results.append(_run("caja", "Apertura de caja (si estaba cerrada)", t_caja_apertura_if_needed))
 
     venta_id: Optional[int] = None
-    stock_before_venta: Optional[int] = None
+    ventas_pago_qa: list[dict[str, Any]] = []
 
-    def t_venta_crear() -> tuple[bool, str, str]:
-        nonlocal venta_id, stock_before_venta
+    def t_ventas_multiples_formas_pago() -> tuple[bool, str, str]:
+        """Varias ventas: Efectivo C$, Efectivo USD, Transferencia, Tarjeta; valida stock y cobros."""
+        nonlocal venta_id
         if not product_id:
             return False, "sin producto", ""
-        r0, _, ok0, d0, _ = client.request("GET", f"/productos/{product_id}")
-        if not ok0:
-            return False, "lectura stock previa falló", ""
-        stock_before_venta = (d0 or {}).get("stockTotal") or (d0 or {}).get("StockTotal")
-        body = {"items": [{"productoId": product_id, "productoVarianteId": None, "cantidad": 1}], "observaciones": "QA venta"}
-        r, ms, ok, data, msg = client.request("POST", "/pos/ventas", json_body=body)
-        if not ok:
-            return False, msg, "POS requiere caja abierta y stock suficiente."
-        venta_id = (data or {}).get("id") or (data or {}).get("Id")
-        total = (data or {}).get("total") or (data or {}).get("Total")
-        r1, _, ok1, d1, _ = client.request("GET", f"/productos/{product_id}")
-        st1 = (d1 or {}).get("stockTotal") if ok1 else None
-        if stock_before_venta is not None and st1 is not None and int(st1) != int(stock_before_venta) - 1:
-            return False, f"stock esperaba {int(stock_before_venta)-1} obtuvo {st1}", "Inconsistencia stock vs venta POS."
+        tc = _fetch_tipo_cambio(client)
+        partes: list[str] = []
+
+        # (tipoPago, moneda, montoPagado o None si se calcula USD, banco opcional, etiqueta test)
+        escenarios: list[tuple[str, str, Optional[float], Optional[str], str]] = [
+            ("Efectivo", MONEDA_CORDOBAS, 5000.0, None, "Efectivo+Córdobas"),
+            ("Efectivo", MONEDA_DOLARES, None, None, "Efectivo+Dólares"),
+            ("Transferencia", MONEDA_CORDOBAS, 5000.0, "Banco QA", "Transferencia+Córdobas"),
+            ("Tarjeta", MONEDA_CORDOBAS, 5000.0, None, "Tarjeta+Córdobas"),
+        ]
+
+        for tipo, moneda, monto_fijo, banco, etiqueta in escenarios:
+            r0, _, ok0, d0, _ = client.request("GET", f"/productos/{product_id}")
+            if not ok0:
+                return False, f"[{etiqueta}] no se leyó stock", ""
+            stock_antes = (d0 or {}).get("stockTotal") or (d0 or {}).get("StockTotal")
+
+            ok_c, err_c, vid, total_v = _crear_venta_pos(client, product_id)
+            if not ok_c or not vid:
+                return False, f"[{etiqueta}] crear venta: {err_c}", "Caja abierta y stock > 0."
+
+            r1, _, ok1, d1, _ = client.request("GET", f"/productos/{product_id}")
+            st1 = (d1 or {}).get("stockTotal") if ok1 else None
+            if stock_antes is not None and st1 is not None and int(st1) != int(stock_antes) - 1:
+                return False, f"[{etiqueta}] stock inconsistente", ""
+
+            total_c = float(total_v) if total_v is not None else 100.0
+            if moneda == MONEDA_DOLARES:
+                # Monto en USD >= total C$ / TC (backend valida en dólares)
+                usd_min = (total_c / tc) if tc > 0 else 3.0
+                monto_pago = round(max(usd_min + 0.5, 3.0), 2)
+            else:
+                monto_pago = monto_fijo if monto_fijo is not None else 5000.0
+
+            ok_p, det_p = _procesar_pago(client, vid, tipo, moneda, monto_pago, banco=banco)
+            if not ok_p:
+                return False, f"[{etiqueta}] pago: {det_p}", "Revisar tipo de cambio y montos."
+
+            venta_id = vid
+            ventas_pago_qa.append(
+                {
+                    "ventaId": vid,
+                    "etiqueta": etiqueta,
+                    "tipoPago": tipo,
+                    "moneda": moneda,
+                    "detallePago": det_p,
+                }
+            )
+            partes.append(f"{etiqueta}: venta={vid} {det_p}")
+
         ctx.venta_id = venta_id
-        return True, f"venta id={venta_id} total={total} stock tras crear={st1}", _slow_rec(ms)
+        ctx.extras["ventasFormasPago"] = ventas_pago_qa
+        return True, "; ".join(partes), ""
 
-    results.append(_run("ventas", "Crear venta POS (descuenta stock)", t_venta_crear))
+    results.append(_run("ventas", "Ventas + cobros: Efectivo C$, Efectivo USD, Transferencia, Tarjeta", t_ventas_multiples_formas_pago))
 
-    def t_venta_pago() -> tuple[bool, str, str]:
-        if not venta_id:
-            return False, "sin venta", ""
-        body = {"ventaId": venta_id, "tipoPago": "Efectivo", "montoPagado": 5000, "moneda": "Cordobas"}
-        r, ms, ok, data, msg = client.request("POST", "/ventas/procesar-pago", json_body=body)
+    def t_reporte_detalle_metodo_moneda() -> tuple[bool, str, str]:
+        """Comprueba que el detalle de ventas devuelve metodoPago y moneda acordes a los cobros QA."""
+        if len(ventas_pago_qa) < 4:
+            return False, "faltan ventas QA", ""
+        hoy = date.today().isoformat()
+        _, _, ok, data, msg = client.request(
+            "GET",
+            "/reportes/resumen-ventas/detalle",
+            params={"desde": hoy, "hasta": hoy, "filtroVentas": "activas"},
+        )
         if not ok:
-            return False, msg, "Validar totales, tipo de pago y estado de la venta."
-        neto = (data or {}).get("totalNetoCordobas") or (data or {}).get("TotalNetoCordobas")
-        vuelto = (data or {}).get("vuelto") or (data or {}).get("Vuelto")
-        return True, f"pago OK totalNeto={neto} vuelto={vuelto}", _slow_rec(ms)
+            return False, msg, ""
+        items = _get_list(data)
+        by_id = {((it or {}).get("id") or (it or {}).get("Id")): it for it in items if isinstance(it, dict)}
 
-    results.append(_run("ventas", "Procesar pago (caja)", t_venta_pago))
+        errores: list[str] = []
+        for v in ventas_pago_qa:
+            vid = v["ventaId"]
+            row = by_id.get(vid)
+            if not row:
+                errores.append(f"id {vid} no en detalle hoy")
+                continue
+            mp = (row.get("metodoPago") or row.get("MetodoPago") or "").strip()
+            mon = (row.get("moneda") or row.get("Moneda") or "") or ""
+            esperado_tipo = v["tipoPago"]
+            if esperado_tipo.lower() not in mp.lower():
+                errores.append(f"id {vid} metodoPago='{mp}' esperaba contener '{esperado_tipo}'")
+            if v["moneda"] == MONEDA_DOLARES and "Dólar" not in mon and "USD" not in mon:
+                errores.append(f"id {vid} moneda='{mon}' esperaba Dólares")
+            if v["moneda"] == MONEDA_CORDOBAS and mon and "Córdob" not in mon:
+                errores.append(f"id {vid} moneda='{mon}' esperaba Córdobas")
+
+        if errores:
+            return False, "; ".join(errores), "API reportes debe exponer metodoPago y moneda por ticket."
+        return True, "detalle reporte OK: método y moneda coinciden con cobros QA", ""
+
+    results.append(_run("reportes", "Detalle ventas: metodoPago y moneda (post-cobros)", t_reporte_detalle_metodo_moneda))
+
+    # —— Caja: preview, historial, cierre, detalle, export, reapertura ——
+    cierre_id_qa: Optional[int] = None
+    monto_preview_esperado: Optional[float] = None
+
+    def t_caja_preview_cierre() -> tuple[bool, str, str]:
+        nonlocal cierre_id_qa, monto_preview_esperado
+        r, ms, ok, data, msg = client.request("GET", "/caja/cierre/preview")
+        if not ok:
+            return False, msg, "Requiere caja abierta."
+        cierre = (data or {}).get("cierre") or (data or {}).get("Cierre") or {}
+        cierre_id_qa = cierre.get("id") or cierre.get("Id")
+        totales = (data or {}).get("totales") or (data or {}).get("Totales") or {}
+        monto_preview_esperado = totales.get("montoEsperado")
+        if monto_preview_esperado is None:
+            monto_preview_esperado = totales.get("MontoEsperado")
+        if monto_preview_esperado is not None:
+            try:
+                monto_preview_esperado = float(monto_preview_esperado)
+            except (TypeError, ValueError):
+                monto_preview_esperado = None
+        tv = totales.get("totalVentas") or totales.get("TotalVentas")
+        return True, f"cierre id={cierre_id_qa} montoEsperado={monto_preview_esperado} totalVentas={tv}", _slow_rec(ms)
+
+    results.append(_run("caja", "Preview cierre de caja", t_caja_preview_cierre))
+
+    def t_caja_historial() -> tuple[bool, str, str]:
+        r, ms, ok, data, msg = client.request("GET", "/caja/historial", params={"page": 1, "pageSize": 10})
+        if not ok:
+            return False, msg, ""
+        items = _get_paged_items(data)
+        total = (data or {}).get("totalItems") or (data or {}).get("TotalItems") or 0
+        return True, f"{len(items)} filas (totalItems={total})", _slow_rec(ms)
+
+    results.append(_run("caja", "Historial de cierres (paginado)", t_caja_historial))
+
+    def t_caja_cerrar() -> tuple[bool, str, str]:
+        nonlocal cierre_id_qa
+        body: dict[str, Any] = {"observaciones": "QA cierre automatizado"}
+        if monto_preview_esperado is not None:
+            body["montoReal"] = round(monto_preview_esperado, 2)
+        r, ms, ok, data, msg = client.request("POST", "/caja/cierre", json_body=body)
+        if not ok:
+            return False, msg, "Cerrar caja con monto real o null."
+        cid = (data or {}).get("id") or (data or {}).get("Id")
+        if cid:
+            cierre_id_qa = cid
+        est = (data or {}).get("estado") or (data or {}).get("Estado")
+        diff = (data or {}).get("diferencia") if "diferencia" in (data or {}) else (data or {}).get("Diferencia")
+        ctx.extras["cierreCajaId"] = cierre_id_qa
+        return True, f"cierre id={cierre_id_qa} estado={est} diferencia={diff}", _slow_rec(ms)
+
+    results.append(_run("caja", "Cerrar caja (POST cierre)", t_caja_cerrar))
+
+    def t_caja_estado_cerrada() -> tuple[bool, str, str]:
+        r, ms, ok, data, msg = client.request("GET", "/caja/estado")
+        if not ok:
+            return False, msg, ""
+        abierta = (data or {}).get("abierta") or (data or {}).get("Abierta")
+        if abierta is True:
+            return False, "caja sigue marcada como abierta", "Tras cierre debe figurar cerrada."
+        return True, "caja no abierta (OK)", _slow_rec(ms)
+
+    results.append(_run("caja", "Estado tras cierre (sin caja abierta)", t_caja_estado_cerrada))
+
+    def t_caja_detalle_cierre() -> tuple[bool, str, str]:
+        if not cierre_id_qa:
+            return False, "sin id de cierre", ""
+        r, ms, ok, data, msg = client.request("GET", f"/caja/cierres/{cierre_id_qa}")
+        if not ok:
+            r2, ms2, ok2, data2, msg2 = client.request("GET", f"/caja/historial/{cierre_id_qa}")
+            if not ok2:
+                return False, f"cierres/{cierre_id_qa}: {msg}; historial/{cierre_id_qa}: {msg2}", ""
+            data = data2
+            ms = ms2
+        tot = (data or {}).get("totalGeneral") or (data or {}).get("TotalGeneral")
+        return True, f"detalle cierre id={cierre_id_qa} totalGeneral={tot}", _slow_rec(ms)
+
+    results.append(_run("caja", "Detalle de cierre por id (cierres/{id})", t_caja_detalle_cierre))
+
+    def t_caja_export_historial_xlsx() -> tuple[bool, str, str]:
+        r, ms, data = client.get_binary("/caja/historial/exportar", params={})
+        if r.status_code >= 500:
+            return False, f"HTTP {r.status_code}", ""
+        if r.status_code >= 400:
+            return False, r.text[:200], ""
+        good, why = _try_xlsx_structure(data)
+        return (True, f"Excel historial caja: {why}", _slow_rec(ms)) if good else (False, why, "")
+
+    results.append(_run("caja", "Exportar historial cierres (Excel)", t_caja_export_historial_xlsx))
+
+    def t_caja_reapertura() -> tuple[bool, str, str]:
+        body = {"montoInicial": 3500}
+        r, ms, ok, data, msg = client.request("POST", "/caja/apertura", json_body=body)
+        if not ok:
+            return False, msg, "Tras cerrar, debe poder abrirse de nuevo."
+        r2, ms2, ok2, d2, _ = client.request("GET", "/caja/estado")
+        abierta = (d2 or {}).get("abierta") if ok2 else None
+        return True, f"apertura OK caja abierta={abierta}", _slow_rec(ms + ms2)
+
+    results.append(_run("caja", "Reapertura de caja (nuevo turno)", t_caja_reapertura))
+
+    # —— Ticket PDF (última venta QA) ——
+    def t_venta_ticket_pdf() -> tuple[bool, str, str]:
+        if not venta_id:
+            return False, "sin ventaId", ""
+        r, ms, data = client.get_binary(f"/ventas/{venta_id}/ticket")
+        if r.status_code >= 500:
+            return False, f"HTTP {r.status_code}", ""
+        if r.status_code >= 400:
+            return False, r.text[:200], ""
+        if len(data) < 4 or not data[:4].startswith(b"%PDF"):
+            return False, "respuesta no parece PDF", ""
+        return True, f"ticket PDF {len(data)} bytes", _slow_rec(ms)
+
+    results.append(_run("ventas", "Descargar ticket PDF (última venta QA)", t_venta_ticket_pdf))
+
+    # —— Dashboard resumen ——
+    def t_dashboard_resumen() -> tuple[bool, str, str]:
+        r, ms, ok, data, msg = client.request("GET", "/dashboard/resumen", params={"topProductos": 5})
+        if not ok:
+            return False, msg, "Requiere rol Admin."
+        keys = list((data or {}).keys()) if isinstance(data, dict) else []
+        return True, f"resumen claves={keys[:12]}", _slow_rec(ms)
+
+    results.append(_run("dashboard", "Resumen dashboard (Admin)", t_dashboard_resumen))
 
     # —— Clientes ——
     cliente_id: Optional[int] = None
@@ -513,6 +805,25 @@ def run_api_tests(client: ApiClient) -> tuple[List[TestResult], QaContext]:
         return True, f"claves: {list((data or {}).keys())[:8]}", _slow_rec(ms)
 
     results.append(_run("reportes", "Resumen de ventas (JSON)", t_rep_resumen))
+
+    def t_rep_productos_top_desglose() -> tuple[bool, str, str]:
+        """Top productos incluye desglosePorFormaPago (método + moneda)."""
+        r, ms, ok, data, msg = client.request("GET", "/reportes/productos-top", params={"top": 15})
+        if not ok:
+            return False, msg, ""
+        items = data if isinstance(data, list) else _get_list(data)
+        if not items:
+            return True, "sin datos en rango default", ""
+        first = items[0] if isinstance(items[0], dict) else {}
+        des = first.get("desglosePorFormaPago") or first.get("DesglosePorFormaPago") or []
+        n = len(des) if isinstance(des, list) else 0
+        if n == 0:
+            return False, "primer producto sin desglosePorFormaPago", "Backend debe exponer desglose en productos-top."
+        d0 = des[0] if des else {}
+        mp = (d0 or {}).get("metodoPago") or (d0 or {}).get("MetodoPago")
+        return True, f"desglose OK ({n} filas) ejemplo método={mp}", _slow_rec(ms)
+
+    results.append(_run("reportes", "Top productos: desglose método/moneda", t_rep_productos_top_desglose))
 
     def t_rep_export() -> tuple[bool, str, str]:
         r, ms, data = client.get_binary("/reportes/resumen-ventas", params={"exportar": "true"})
