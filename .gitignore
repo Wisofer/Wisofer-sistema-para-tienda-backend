@@ -17,3 +17,8 @@ obj/
 ## IDE
 .idea/
 .vs/
+
+## Python
+__pycache__/
+*.py[cod]
+*.pyc
