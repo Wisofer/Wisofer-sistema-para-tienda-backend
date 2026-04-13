@@ -62,7 +62,7 @@ public class ReporteService : IReporteService
             .ThenBy(v => v.Id)
             .ToListAsync();
 
-        var netoPorVenta = await GetNetoPorVentaAsync(ventas);
+        var (netoPorVenta, pagosBatch) = await CargarNetoYPagosAsync(ventas);
 
         return ventas.Select(v =>
         {
@@ -79,7 +79,9 @@ public class ReporteService : IReporteService
                 Total = netoPorVenta.GetValueOrDefault(v.Id, subLineas),
                 CantidadLineas = activas.Count,
                 Estado = v.Estado,
-                FechaUltimaActualizacion = v.FechaActualizacion
+                FechaUltimaActualizacion = v.FechaActualizacion,
+                MetodoPago = v.MetodoPago ?? "",
+                Moneda = FormatearMonedaEtiqueta(MonedaDelCobro(v.Id, pagosBatch))
             };
         }).ToList();
     }
@@ -97,7 +99,7 @@ public class ReporteService : IReporteService
         if (v.Estado != SD.EstadoVentaPagado && v.Estado != SD.EstadoVentaCompletada && v.Estado != SD.EstadoVentaAnulada)
             return null;
 
-        var netoMap = await GetNetoPorVentaAsync(new[] { v });
+        var (netoMap, pagosTicket) = await CargarNetoYPagosAsync(new[] { v });
         var lineas = v.DetalleVentas.OrderBy(d => d.Id).Select(d => new VentaLineaReporte
         {
             DetalleId = d.Id,
@@ -129,6 +131,8 @@ public class ReporteService : IReporteService
             TotalCobrado = netoMap.GetValueOrDefault(v.Id, subLineas),
             CantidadLineas = activas.Count,
             CantidadUnidades = unidades,
+            MetodoPago = v.MetodoPago ?? "",
+            Moneda = FormatearMonedaEtiqueta(MonedaDelCobro(v.Id, pagosTicket)),
             Lineas = lineas
         };
     }
@@ -284,7 +288,8 @@ public class ReporteService : IReporteService
             numero = v.Numero,
             fecha = v.Fecha,
             estado = v.Estado,
-            metodoPago = "Venta POS",
+            metodoPago = v.MetodoPago,
+            moneda = v.Moneda,
             lineas = v.CantidadLineas,
             subtotalLineas = v.SubtotalLineas,
             total = v.Total
@@ -358,6 +363,13 @@ public class ReporteService : IReporteService
 
     private async Task<Dictionary<int, decimal>> GetNetoPorVentaAsync(IEnumerable<Venta> ventas)
     {
+        var (neto, _) = await CargarNetoYPagosAsync(ventas);
+        return neto;
+    }
+
+    /// <summary>Carga pagos relacionados con las ventas y calcula el neto cobrado por ticket.</summary>
+    private async Task<(Dictionary<int, decimal> Neto, List<Pago> Pagos)> CargarNetoYPagosAsync(IEnumerable<Venta> ventas)
+    {
         var ventaIds = ventas.Select(v => v.Id).ToHashSet();
         var pagosBatch = await _context.Pagos
             .AsNoTracking()
@@ -365,7 +377,31 @@ public class ReporteService : IReporteService
             .Where(p => (p.VentaId.HasValue && ventaIds.Contains(p.VentaId.Value))
                 || p.PagoVentas.Any(pv => ventaIds.Contains(pv.VentaId)))
             .ToListAsync();
-        return CobroVentasHelper.NetoCobradoPorVenta(ventaIds, pagosBatch);
+        var neto = CobroVentasHelper.NetoCobradoPorVenta(ventaIds, pagosBatch);
+        return (neto, pagosBatch);
+    }
+
+    /// <summary>Moneda del cobro positivo para el ticket (primer pago aplicable por fecha).</summary>
+    private static string? MonedaDelCobro(int ventaId, List<Pago> pagos)
+    {
+        foreach (var p in pagos.OrderBy(x => x.FechaPago))
+        {
+            if (CobroVentasHelper.NetoAplicadoAVenta(p, ventaId) > 0)
+                return string.IsNullOrWhiteSpace(p.Moneda) ? null : p.Moneda.Trim();
+        }
+
+        return null;
+    }
+
+    /// <summary>Etiqueta legible para UI (Córdobas / Dólares).</summary>
+    private static string? FormatearMonedaEtiqueta(string? monedaRaw)
+    {
+        if (string.IsNullOrWhiteSpace(monedaRaw)) return null;
+        if (monedaRaw.Equals(SD.MonedaDolar, StringComparison.OrdinalIgnoreCase))
+            return "Dólares (USD)";
+        if (monedaRaw.Equals(SD.MonedaCordoba, StringComparison.OrdinalIgnoreCase))
+            return "Córdobas (C$)";
+        return monedaRaw;
     }
 
     #endregion

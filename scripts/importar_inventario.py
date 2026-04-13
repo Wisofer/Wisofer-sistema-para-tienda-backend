@@ -1,35 +1,29 @@
 #!/usr/bin/env python3
 """
-Importa productos desde Excel de inventario del cliente.
+Importación única de inventario (reemplaza al antiguo seed + import por separado).
 
-Hoja usada (en este orden si existe): **FORMATO INVENTARIO**, si no **Productos** (export generado por la API).
+1) **Sembrado de categorías** desde ``scripts/familias_cliente.json`` (familias/códigos del Excel extendido).
+   Omitir con ``--skip-seed-categorias`` si no aplica.
 
-1) **Extendido (Excel del cliente)** — hoja FORMATO INVENTARIO:
-   CODIGO, NOMBRE DE PRODUCTO, …, CODIGO FAMILIA, …, PRECIO DE COMPRA, P.V AL PUBLICO, EXISTENCIA.
-   La categoría se resuelve con **scripts/familias_cliente.json** (código familia → nombre).
+2) **Productos** desde uno o más .xlsx.
 
-2) **Legado / export app** — categoría en texto; cabeceras típicas:
-   Código, Nombre, Categoría, Precio Compra, Precio Venta, Stock Total (hoja **Productos**).
+Hoja usada (orden): **FORMATO INVENTARIO**, si no **Productos** (export de la API).
 
-- Crea categorías si no existen (nombre único).
-- Códigos duplicados entre filas/archivos: solo cuenta la primera aparición (aviso en stderr).
-- Re-ejecutar: UPSERT por código (actualiza nombre, precios, stock, categoría).
+- **Extendido:** CODIGO FAMILIA + ``familias_cliente.json``.
+- **Legado / inventario completo / export app:** categoría en texto; columnas tipo
+  PRECIO COMPRA, P.V AL PUBLICO / PRECIO VENTA / **p. venta**, EXISTENCIA / STOCK TOTAL.
+
+Sin argumentos, si existe ``inventario completo.xlsx`` en la raíz del proyecto, se importa solo ese archivo.
 
 Uso:
   pip install psycopg2-binary openpyxl
 
-  python3 scripts/import_productos_excel.py \\
-    "/ruta/inventario competo Ke Encanto abril2026.xlsx" \\
-    "/ruta/inventario Bonitas 6 abril.xlsx" \\
-    "/ruta/INVENTARIO ACTUAL YUSTER.xlsx"
+  python3 scripts/clear_database.py --yes
+  python3 scripts/importar_inventario.py
 
-  python3 scripts/import_productos_excel.py -f uno.xlsx -f otro.xlsx
+  python3 scripts/importar_inventario.py /home/usuario/Descargas/otro_inventario.xlsx
 
-  DATABASE_URL=postgresql://... python3 scripts/import_productos_excel.py --file archivo.xlsx
-
-Sin archivos en línea de comandos, si existen en Descargas los tres Excel del cliente, se usan por defecto.
-Para cargar el inventario completo exportado por el sistema (~800+ ítems), pasa también
-``inventario_productos_YYYY-MM-DD.xlsx`` (hoja Productos).
+  python3 scripts/importar_inventario.py --skip-seed-categorias solo_productos.xlsx
 """
 from __future__ import annotations
 
@@ -57,10 +51,9 @@ except ImportError:
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 
+# Por defecto: inventario unificado en la raíz del backend (nombre que entregó el cliente)
 DEFAULT_XLSX_CANDIDATES = [
-    Path("/home/william/Descargas/inventario competo Ke Encanto abril2026.xlsx"),
-    Path("/home/william/Descargas/inventario Bonitas 6 abril.xlsx"),
-    Path("/home/william/Descargas/INVENTARIO ACTUAL YUSTER.xlsx"),
+    ROOT / "inventario completo.xlsx",
 ]
 
 SHEET_PRIORITY = ("FORMATO INVENTARIO", "Productos")
@@ -93,14 +86,37 @@ def load_dsn() -> str:
 def load_familias_map() -> dict[int, str]:
     path = SCRIPT_DIR / "familias_cliente.json"
     if not path.is_file():
-        print(f"No se encuentra {path}", file=sys.stderr)
-        sys.exit(1)
+        return {}
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
     out: dict[int, str] = {}
     for row in data:
         out[int(row["codigo"])] = str(row["nombre"]).strip()
     return out
+
+
+def seed_categorias_familias(cur, conn) -> int:
+    """Inserta/actualiza categorías desde familias_cliente.json (ON CONFLICT por nombre)."""
+    path = SCRIPT_DIR / "familias_cliente.json"
+    if not path.is_file():
+        print(f"Aviso: no hay {path} — se omiten categorías por familia (solo las que creen los productos).")
+        return 0
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    sql = """
+    INSERT INTO "CategoriasProducto" ("Nombre", "Descripcion", "Activo", "FechaCreacion")
+    VALUES (%s, NULL, TRUE, NOW())
+    ON CONFLICT ("Nombre") DO UPDATE SET "Activo" = EXCLUDED."Activo"
+    """
+    n = 0
+    for row in data:
+        nombre = str(row["nombre"]).strip()
+        if not nombre:
+            continue
+        cur.execute(sql, (nombre,))
+        n += 1
+    conn.commit()
+    return n
 
 
 def norm_cat(s: str) -> str:
@@ -110,12 +126,68 @@ def norm_cat(s: str) -> str:
 
 
 def to_decimal(v) -> Decimal:
+    """
+    Convierte celda Excel a decimal.
+
+    En inventario completo.xlsx, ``p. venta`` mezcla:
+    - enteros (910 filas): 300, 850…
+    - texto (163 filas): ``C$600.00``, ``C$3,400.00`` (miles con coma),
+      ``C$ 1.700,00`` / ``c$592`` (coma decimal estilo NI/EU), comillas, espacios.
+    """
     if v is None or v == "":
         return Decimal("0")
-    if isinstance(v, (int, float)):
+    if isinstance(v, bool):
+        return Decimal("0")
+    if isinstance(v, int):
+        return Decimal(v)
+    if isinstance(v, float):
         return Decimal(str(v))
+
+    s = str(v).strip()
+    for _ in range(2):
+        s = s.strip().strip('"').strip("'").strip("\u201c\u201d\u2018\u2019")
+    s = s.replace("\xa0", " ").replace("\u2009", "").strip()
+    if not s:
+        return Decimal("0")
+
+    s = re.sub(r"(?i)^\s*c\$\s*", "", s)
+    s = s.replace("$", "").strip()
+    s = re.sub(r"\s+", "", s)
+    if not s:
+        return Decimal("0")
+
+    if re.fullmatch(r"-?\d+", s):
+        return Decimal(s)
+
+    has_comma = "," in s
+    has_dot = "." in s
+
+    if has_comma and has_dot:
+        last_c = s.rfind(",")
+        last_d = s.rfind(".")
+        if last_c > last_d:
+            # Europeo / NI: 1.700,00 (punto = miles, coma = decimales)
+            s = s.replace(".", "").replace(",", ".")
+        else:
+            # US: 3,400.00
+            s = s.replace(",", "")
+    elif has_comma and not has_dot:
+        parts = s.split(",")
+        if len(parts) == 2 and parts[1].isdigit() and len(parts[1]) <= 2:
+            left = parts[0].replace(".", "")
+            s = left + "." + parts[1]
+        else:
+            s = s.replace(",", "")
+    elif has_dot and not has_comma:
+        # 600.00 → decimal; 1.700 sin coma → a menudo 1700 córdobas (miles con punto)
+        m = re.fullmatch(r"(\d{1,3})\.(\d{3})", s)
+        if m:
+            s = m.group(1) + m.group(2)
+        # si no coincide (ej. 12.50), queda para Decimal
+
     try:
-        return Decimal(str(v).strip().replace(",", "."))
+        d = Decimal(s)
+        return d
     except (InvalidOperation, ValueError):
         return Decimal("0")
 
@@ -219,7 +291,7 @@ def process_sheet(
     idx_fam = col_index(headers, "CODIGO FAMILIA")
     idx_cat_text = col_index(headers, "CATEGORIA", "CATEGORÍA")
     idx_pcompra = col_index(headers, "PRECIO DE COMPRA", "PRECIO COMPRA")
-    idx_pventa = col_index(headers, "P.V AL PUBLICO", "P.V PUBLICO", "PRECIO VENTA")
+    idx_pventa = col_index(headers, "P.V AL PUBLICO", "P.V PUBLICO", "PRECIO VENTA", "P. VENTA")
     idx_exist = col_index(headers, "EXISTENCIA", "STOCK TOTAL")
 
     extended = idx_fam is not None and idx_codigo is not None and idx_nombre is not None
@@ -311,12 +383,12 @@ def process_sheet(
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Importar productos desde Excel(s) de inventario.")
+    ap = argparse.ArgumentParser(description="Sembrar categorías (JSON) e importar productos desde Excel.")
     ap.add_argument(
         "files",
         nargs="*",
         type=Path,
-        help="Uno o más .xlsx (hoja FORMATO INVENTARIO)",
+        help="Uno o más .xlsx",
     )
     ap.add_argument(
         "-f",
@@ -324,7 +396,12 @@ def main() -> None:
         action="append",
         type=Path,
         dest="extra_files",
-        help="Otro Excel (puede repetirse; se añade a files)",
+        help="Otro Excel (puede repetirse)",
+    )
+    ap.add_argument(
+        "--skip-seed-categorias",
+        action="store_true",
+        help="No ejecutar INSERT de categorías desde familias_cliente.json",
     )
     args = ap.parse_args()
     files: list[Path] = list(args.files or [])
@@ -336,16 +413,20 @@ def main() -> None:
 
     if not files:
         print(
-            "Indica al menos un .xlsx:\n"
-            "  python3 scripts/import_productos_excel.py archivo1.xlsx archivo2.xlsx\n"
-            "O coloca en Descargas los tres inventarios del cliente (nombres por defecto).",
+            "Indica al menos un .xlsx o coloca ``inventario completo.xlsx`` en la raíz del proyecto.\n"
+            "  python3 scripts/importar_inventario.py archivo.xlsx",
             file=sys.stderr,
         )
         sys.exit(1)
 
     for p in files:
         if not p.is_file():
-            print(f"No existe el archivo: {p}", file=sys.stderr)
+            print(
+                f"No existe el archivo: {p}\n"
+                "  Usa una ruta real (no el ejemplo /ruta/a/tu.xlsx de la ayuda).\n"
+                "  Sin argumentos se usa «inventario completo.xlsx» en la raíz del proyecto si existe.",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     familias_map = load_familias_map()
@@ -363,6 +444,10 @@ def main() -> None:
 
     try:
         with conn.cursor() as cur:
+            if not args.skip_seed_categorias:
+                ncat = seed_categorias_familias(cur, conn)
+                if ncat:
+                    print(f"Categorías desde familias_cliente.json: {ncat} (nuevas o actualizadas).")
             for fp in files:
                 wb = openpyxl.load_workbook(fp, read_only=True, data_only=True)
                 try:

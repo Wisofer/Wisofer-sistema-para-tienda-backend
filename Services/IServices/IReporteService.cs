@@ -102,6 +102,12 @@ public class VentaDetalleReporte
 
     /// <summary>Última modificación del ticket (útil para auditoría de anulaciones).</summary>
     public DateTime FechaUltimaActualizacion { get; set; }
+
+    /// <summary>Método de cobro (Efectivo, Tarjeta, Transferencia, …) según el ticket.</summary>
+    public string MetodoPago { get; set; } = "";
+
+    /// <summary>Moneda del cobro (Córdobas / Dólares) según el pago registrado.</summary>
+    public string? Moneda { get; set; }
 }
 
 /// <summary>Detalle completo de un ticket para reportes (una venta, N líneas).</summary>
@@ -117,6 +123,13 @@ public class VentaTicketCompletoReporte
     public decimal TotalCobrado { get; set; }
     public int CantidadLineas { get; set; }
     public int CantidadUnidades { get; set; }
+
+    /// <summary>Método de cobro (Efectivo, Tarjeta, …).</summary>
+    public string MetodoPago { get; set; } = "";
+
+    /// <summary>Moneda del cobro (Córdobas / Dólares).</summary>
+    public string? Moneda { get; set; }
+
     public List<VentaLineaReporte> Lineas { get; set; } = new();
 }
 

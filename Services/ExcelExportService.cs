@@ -42,7 +42,7 @@ public class ExcelExportService
     public byte[] ExportarVentasReporte(IEnumerable<dynamic> ventas)
     {
         using var package = new ExcelPackage();
-        string[] headers = { "Ticket #", "Fecha", "Estado", "Nº líneas", "Subtotal líneas (C$)", "Total cobrado (C$)" };
+        string[] headers = { "Ticket #", "Fecha", "Estado", "Método pago", "Moneda", "Nº líneas", "Subtotal líneas (C$)", "Total cobrado (C$)" };
         var worksheet = PrepareSheet(package, "Reporte Ventas", headers, HeaderIndigo);
 
         int row = 2;
@@ -51,13 +51,15 @@ public class ExcelExportService
             worksheet.Cells[row, 1].Value = v.numero ?? v.Numero ?? "";
             worksheet.Cells[row, 2].Value = (v.fecha ?? v.Fecha) is DateTime dt ? dt.ToString("dd/MM/yyyy HH:mm") : "";
             worksheet.Cells[row, 3].Value = GetValueSafe(v, "estado")?.ToString() ?? GetValueSafe(v, "Estado")?.ToString() ?? "";
-            worksheet.Cells[row, 4].Value = v.lineas ?? v.Lineas ?? 0;
-            SetCellMoney(worksheet, row, 5, v.subtotalLineas ?? v.SubtotalLineas ?? 0m);
-            SetCellMoney(worksheet, row, 6, v.total ?? v.Total ?? 0m);
+            worksheet.Cells[row, 4].Value = GetValueSafe(v, "metodoPago")?.ToString() ?? GetValueSafe(v, "MetodoPago")?.ToString() ?? "";
+            worksheet.Cells[row, 5].Value = GetValueSafe(v, "moneda")?.ToString() ?? GetValueSafe(v, "Moneda")?.ToString() ?? "";
+            worksheet.Cells[row, 6].Value = v.lineas ?? v.Lineas ?? 0;
+            SetCellMoney(worksheet, row, 7, v.subtotalLineas ?? v.SubtotalLineas ?? 0m);
+            SetCellMoney(worksheet, row, 8, v.total ?? v.Total ?? 0m);
             row++;
         }
 
-        if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 5, 6 });
+        if (row > 2) AddTotalRow(worksheet, 2, row - 1, new[] { 7, 8 });
         ApplyExpertStyles(worksheet, worksheet.Dimension.End.Row, headers.Length, "Reporte de Ventas");
         return package.GetAsByteArray();
     }
